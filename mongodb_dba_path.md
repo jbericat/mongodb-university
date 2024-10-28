@@ -247,3 +247,65 @@ It's not always easy to recognize these anti-patterns, but some of the tools ava
 - Shows index recommendations
 - identifies unnecessary indexes
 - highlight issues with the schema
+
+## 3. The Mongodb Shell
+
+### 3.1. Installing and Connecting to the MongoDB Shell
+
+First we'll learn how to install the `mongosh` in an ubuntu OS and then we'll connect to an Atlas cluster.
+
+Is a powerfull shell for mongoDB. It gives users a friendly interface for managing, interacting with and testing queries against your database.
+
+
+
+#### 3.1.1. Installing mongosh
+
+```bash
+$ sudo apt update
+sudo apt install gnupg
+
+```
+
+#### 3.1.2. Connecting to an Atlas cluster
+
+
+Connection to an atlas cluster requiers the Atlas connection string
+
+Atlas connection string allows us to include authentication strings, which makes authentication using
+
+```bash
+
+
+```
+
+#### 3.1.3. Common modifiers, helpers and methods for the mongosh
+
+`modifiers` are parameters we can include when running the mongosh command:
+
+```bash
+--port 27017
+--apiversion
+--username
+```
+
+`helpers` are used to interact with databases and collections:
+
+```bash
+db # Return the current db we're connected to
+use db_name # Switch to a different db
+show collections # To view all collections within a container / db
+show dbs # to list all dbs on the server
+```
+
+`CRUD` operations allows us to manipulate our data:
+
+db.collection_name.insertOne({...})
+db.collection_name.updateOne({...})
+db.collection_name.deleteOne({...})
+
+`methods` are used to run various queries on our collections:
+
+```bash
+db.collection.find() # Finds all documents in a collection
+db.collection.findOne({...}) # Finds an specific document in a collection
+```
