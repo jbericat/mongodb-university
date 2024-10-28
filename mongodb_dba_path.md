@@ -260,10 +260,27 @@ Is a powerfull shell for mongoDB. It gives users a friendly interface for managi
 
 #### 3.1.1. Installing mongosh
 
-```bash
-$ sudo apt update
-sudo apt install gnupg
+**Ubuntu 22.04**
 
+```bash
+sudo su
+apt update
+apt install gnupg
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntufocal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+apt update
+apt install -y mongodb-mongosh
+mongosh --version
+```
+
+**ubuntu 24.04**
+
+```bash
+sudo su
+curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg --dearmor
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+sudo apt update
+sudo apt install -y mongodb-mongosh
 ```
 
 #### 3.1.2. Connecting to an Atlas cluster
@@ -274,7 +291,7 @@ Connection to an atlas cluster requiers the Atlas connection string
 Atlas connection string allows us to include authentication strings, which makes authentication using
 
 ```bash
-
+mongosh "mongodb+srv://<username>:<password>@<cluster_name>.example.mongodb.net"
 
 ```
 
@@ -290,7 +307,7 @@ Atlas connection string allows us to include authentication strings, which makes
 
 `helpers` are used to interact with databases and collections:
 
-```bash
+```sh
 db # Return the current db we're connected to
 use db_name # Switch to a different db
 show collections # To view all collections within a container / db
@@ -299,13 +316,112 @@ show dbs # to list all dbs on the server
 
 `CRUD` operations allows us to manipulate our data:
 
+```js
 db.collection_name.insertOne({...})
 db.collection_name.updateOne({...})
 db.collection_name.deleteOne({...})
+```
 
 `methods` are used to run various queries on our collections:
 
+```js
+db.hello() // provides some information about the role of the mongod instance we are connected to.
+db.collection.find() // Finds all documents in a collection
+db.collection.findOne({...}) // Finds an specific document in a collection
+```
+
+### 3.2. Configuring the MongoDB Shell
+
+There are three different ways to configure the MongoDB Shell:
+
+- Set configration options by using the config API
+- Change settings via the mongosh.conf
+- Pass commandline arguments to mongosh to change specific settings or the return the results of a query
+
+
+#### 3.2.1. Config API
+
+- Enables us to change settings in the shell.
+- We access the config API through the `config` object
+- Setting will persist between shell sessions.
+- Stored on a **per-user** basis in the file system
+
+**Examples**
+
+```js
+config.get('enableTelemetry') // Get the 'enableTelemetry' setting value
+config.set('enableTelemetry', false) // Sets the 'enableTelemetry' setting value to 'false'
+config.reset('...') // Reset values to its default setting
+```
+
+The available config options are as follows:
+
+- `displayBatchSize` - The number of documents to display when using the `it` iterator.
+- `maxTimeMS` - The maximum amount of time to allow a query to run.
+- `enableTelemetry` - Whether to enable telemetry.
+- `editor` - The editor to use when editing code.
+- `snippetIndexSourceURLs` - The URLs to use when fetching snippet index files.
+- `snippetRegistryURL` - The URL to use when fetching snippet registry files.
+- `snippetAutoload` - Whether to automatically load snippets.
+- `inspectCompact` - Whether to use compact mode when inspecting objects.
+- `inspectDepth` - The maximum depth to use when inspecting objects.
+- `historyLength` - The number of history entries to keep.
+- `showStackTraces` - Whether to show stack traces when errors occur.
+- `redactHistory` - Whether to redact sensitive information from history.
+
+#### 3.2.2. mongosh.conf
+
+- Plaintext file
+- Allows to modify the same settings that are available through the config API
+- Changes are overridden if the API is used to change the same setting
+- Sets options for all users of the shell
+- Created by the user
+- Location depends on operating system
+
+**Example**
+
+- The `displayBatchSize` and editor settings, which dictates how many documents are displayed per batch with the db.`collection.find()` method (20 by default).
+- The `editor` command determines which context editor will open when using the edit command (vim, nano, etc).
+- Windows: `mongosh.cfg`, in the same directory as the `mongosh.exe` binary.
+- macOS:
+ - `/usr/local/etc/mongosh.conf`
+ - `/etc/mongosh.conf`
+ - `/opt/homebrew/etc/mongosh.conf`
+- Linux: `/etc/mongosh.conf`
+
 ```bash
-db.collection.find() # Finds all documents in a collection
-db.collection.findOne({...}) # Finds an specific document in a collection
+sudo touch /etc/mongosh.conf
+sudo cat > /etc/mongosh.conf << EOF
+mongosh:
+ displayBatchSize: 50
+ inspectDepth: 20
+ redactHistory: "remove-redact"
+END
+```
+
+#### 3.2.3. commandline arguments
+
+- using the `--eval flag`
+- Passing commands or javascript code to `mongosh`
+- We can return the results of a query without entering the shell
+
+**Examples**
+
+To launch mongosh with the `enableTelemetry` setting `disabled` we can use:
+
+```bash
+mongosh --eval "disableTelemetry()"
+```
+
+To return the results of a query without entering the shell, we'll first find three documents form the CLI in a collection by passing the query to the `eval` flag. We'll also add add the --quiet flag to clean-up the output and return only the first three documents:
+
+```bash
+mongosh "mongodb://localhost:27017/sample_analytics" --eval "db.accounts.find().limit(3)" --quiet
+mongosh --eval "db.accounts.find().limit(3)" --quiet
+```
+
+We can also pass variables directly to the shell via the `--eval` flag and the `--shell` flag, which tells mongosh to enable the shell interface. Passing variables this way we can print the value of the variable (hello world) by calling the variable name (hello):
+
+```bash
+mongosh --eval "var hello = 'hello world'" --shell
 ```
