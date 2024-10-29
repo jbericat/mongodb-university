@@ -285,14 +285,12 @@ sudo apt install -y mongodb-mongosh
 
 #### 3.1.2. Connecting to an Atlas cluster
 
-
 Connection to an atlas cluster requiers the Atlas connection string
 
 Atlas connection string allows us to include authentication strings, which makes authentication using
 
 ```bash
 mongosh "mongodb+srv://<username>:<password>@<cluster_name>.example.mongodb.net"
-
 ```
 
 Here’s what each part of the connection string does:
@@ -350,6 +348,7 @@ Example: Find a document with username of samantha27 and remove the account numb
 
 ```bash
 mongosh "mongodb+srv://myAtlasDBUser:myatlas-001@myatlasclusteredu.7so1q.mongodb.net/sample_analytics?appName=config-mongosh" --eval "db.customers.updateOne({username: 'samantha27'}, {\$pull:{accounts: 515170}})"
+```
 
 ### 3.2. Configuring the MongoDB Shell
 
@@ -447,3 +446,5 @@ We can also pass variables directly to the shell via the `--eval` flag and the `
 ```bash
 mongosh --eval "var hello = 'hello world'" --shell
 ```
+
+### 3.3. Using the mongoDB Shell
