@@ -295,6 +295,22 @@ mongosh "mongodb+srv://<username>:<password>@<cluster_name>.example.mongodb.net"
 
 ```
 
+Here’s what each part of the connection string does:
+
+- mongodb+srv://: Specifies that you are connecting to a MongoDB Atlas cluster using the DNS seed list connection format.
+- myAtlasDBUser:myatlas-001: The username and password for your MongoDB database.
+- myatlasclusteredu.7so1q.mongodb.net: The hostname of your MongoDB Atlas cluster.
+- sample_analytics: The database you’re connecting to.
+- ?appName=config-mongosh: Specifies that the application name is "config-mongosh."
+
+**Use of appName**
+
+Setting appName can be helpful in these cases:
+
+- **Diagnostics:** When you monitor or diagnose your MongoDB instance, the appName appears in the server logs, which makes it easier to identify which application or connection is responsible for specific actions.
+- **Connection Pooling:** If you have multiple applications connecting to the same database, using distinct appName values allows you to track resource usage and connection pooling for each application independently.
+- **Logging and Metrics:** MongoDB Atlas, for example, can display metrics per appName, helping you analyze the behavior of different clients.
+
 #### 3.1.3. Common modifiers, helpers and methods for the mongosh
 
 `modifiers` are parameters we can include when running the mongosh command:
@@ -329,6 +345,11 @@ db.hello() // provides some information about the role of the mongod instance we
 db.collection.find() // Finds all documents in a collection
 db.collection.findOne({...}) // Finds an specific document in a collection
 ```
+
+Example: Find a document with username of samantha27 and remove the account number from the accounts array on it
+
+```bash
+mongosh "mongodb+srv://myAtlasDBUser:myatlas-001@myatlasclusteredu.7so1q.mongodb.net/sample_analytics?appName=config-mongosh" --eval "db.customers.updateOne({username: 'samantha27'}, {\$pull:{accounts: 515170}})"
 
 ### 3.2. Configuring the MongoDB Shell
 
@@ -404,6 +425,7 @@ END
 - using the `--eval flag`
 - Passing commands or javascript code to `mongosh`
 - We can return the results of a query without entering the shell
+- we're using the `--nodb` flag to start the shell without requiring a connection string
 
 **Examples**
 
