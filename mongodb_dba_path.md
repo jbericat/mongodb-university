@@ -2,6 +2,8 @@
 
 This learning path contains a series of units to help you, as a Database Administrator, learn MongoDB knowledge and skills. In this path, you’ll learn MongoDB basics as well as how to administer and maintain a MongoDB database.
 
+> This information was obtained from MongoDB University https://learn.mongodb.com/.........
+
 ## 1. MongoDB and the Document Model
 
 How to manage MongoDB databases, collections, and documents.
@@ -250,6 +252,8 @@ It's not always easy to recognize these anti-patterns, but some of the tools ava
 
 ## 3. The Mongodb Shell
 
+> This information was obtained from https://learn.mongodb.com/learn/course/the-mongodb-shell
+
 ### 3.1. Installing and Connecting to the MongoDB Shell
 
 First we'll learn how to install the `mongosh` in an ubuntu OS and then we'll connect to an Atlas cluster.
@@ -448,3 +452,48 @@ mongosh --eval "var hello = 'hello world'" --shell
 ```
 
 ### 3.3. Using the mongoDB Shell
+
+Key facts:
+
+- It's important to know the abiliy of mongosh to leverage javascript
+- In mongoDB is a good practice to use dates in the ISODate format
+
+> TO-DO: CHECK THE VIDEO AGAIN & ELLABORATE
+
+### 3.3.x. Code Summary: Using the MongoDB Shell
+
+The following sections explain how to use `mongosh` to run external scripts and to edit commands in an external editor.
+
+**Run External Scripts**
+
+To run an external script in mongosh, use the load() method. For example, to run the randomPost.js file, you would run the following code:
+
+```js
+load('randomPost.js')
+```
+
+Within your script, you can use the `db.getSiblingDB()` method to access a database without having to switch to it in `mongosh`. For example, here’s how you would access the sample_training database in the `randomPost.js` script:
+
+```js
+db = db.getSiblingDB("sample_training");
+console.log(`\nCurrent database: ${db.getName()}`);
+console.log("Random post sample of 500 words:\n");
+let result = db.posts.aggregate({
+ $sample: { size: 1 },
+});
+printjson(result.next().body.slice(0, 500) + " ...");
+```
+
+**Edit Commands in an External Editor**
+
+To edit a function or command in an external text editor, like Vim or nano, while using mongosh, use the edit command. To use this command, you must first set the config.editor value in mongosh. To do so, use the config.set() method:
+
+```js
+config.set("editor", "vim")
+```
+
+Once the editor is set, you can then use edit to modify a new or existing command. For example, to edit the giveMeADate function, you would run the following code:
+
+```sh
+edit giveMeADate
+```
