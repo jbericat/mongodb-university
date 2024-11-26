@@ -598,3 +598,42 @@ prompt = () => {
 ```
 
 After returning these modifications, we restart the mongosh connect to atlas, and see that now the prompt shows the information we specified on the prompt function.
+
+### 3.5. MongoDB Shell Tips and Tricks
+
+The following sections explain some tips and tricks for using mongosh.
+
+#### 3.5.1. Use Node.js APIs to Read and Write Files
+
+`mongosh` provides access to all native Node.js APIs, including the file system module, or `fs`. This means that you can use `mongosh` to read and write files. In the following example, we assign the result of a query to a variable called `customers` so that it can be used later:
+
+```js
+const customers = db.sales.find({}, {customer: 1, _id: 0})
+```
+
+Next, we use the `fs` module to write the results of the query to a file called `customers.json`. To do this, we pass in the customers variable and use the `EJSON.stringify()` method to convert the array to a string. We also use the `null` and `2` parameters to format the output so that it’s easier to read:
+
+```sh
+fs.writeFileSync('customers.json', EJSON.stringify(customers.toArray()), null, 2)
+```
+
+### 3.5.2. Generate Seed Data
+
+You can also use `npm` packages in `mongosh`, as they support external scripts and `require` statements. In the following example, we use the faker package to generate an array of 10 fake users. We then insert the users as documents into a new database.
+
+```js
+const { faker } = require("@faker-js/faker");
+const users = [];
+for (let i = 0; i < 10; i++) {
+ users.push({
+   name: faker.person.fullName(),
+   email: faker.internet.email(),
+   phone: faker.phone.number(),
+ });
+}
+
+console.log("Inserting fake users ...");
+db.getSiblingDB("test_data").users.insertMany(users);
+```
+
+**Note:** To use the faker package, you must first install it by using `npm install @faker-js/faker --save-dev` in the same directory as your external script. Or, you can install the package globally by using `npm install -g @faker-js/faker`.
