@@ -2,6 +2,8 @@
 
 This learning path contains a series of units to help you, as a Database Administrator, learn MongoDB knowledge and skills. In this path, you’ll learn MongoDB basics as well as how to administer and maintain a MongoDB database.
 
+> This information was obtained from MongoDB University https://learn.mongodb.com/.........
+
 ## 1. MongoDB and the Document Model
 
 How to manage MongoDB databases, collections, and documents.
@@ -250,6 +252,8 @@ It's not always easy to recognize these anti-patterns, but some of the tools ava
 
 ## 3. The Mongodb Shell
 
+> This information was obtained from https://learn.mongodb.com/learn/course/the-mongodb-shell
+
 ### 3.1. Installing and Connecting to the MongoDB Shell
 
 First we'll learn how to install the `mongosh` in an ubuntu OS and then we'll connect to an Atlas cluster.
@@ -285,15 +289,29 @@ sudo apt install -y mongodb-mongosh
 
 #### 3.1.2. Connecting to an Atlas cluster
 
-
 Connection to an atlas cluster requiers the Atlas connection string
 
 Atlas connection string allows us to include authentication strings, which makes authentication using
 
 ```bash
 mongosh "mongodb+srv://<username>:<password>@<cluster_name>.example.mongodb.net"
-
 ```
+
+Here’s what each part of the connection string does:
+
+- mongodb+srv://: Specifies that you are connecting to a MongoDB Atlas cluster using the DNS seed list connection format.
+- myAtlasDBUser:myatlas-001: The username and password for your MongoDB database.
+- myatlasclusteredu.7so1q.mongodb.net: The hostname of your MongoDB Atlas cluster.
+- sample_analytics: The database you’re connecting to.
+- ?appName=config-mongosh: Specifies that the application name is "config-mongosh."
+
+**Use of appName**
+
+Setting appName can be helpful in these cases:
+
+- **Diagnostics:** When you monitor or diagnose your MongoDB instance, the appName appears in the server logs, which makes it easier to identify which application or connection is responsible for specific actions.
+- **Connection Pooling:** If you have multiple applications connecting to the same database, using distinct appName values allows you to track resource usage and connection pooling for each application independently.
+- **Logging and Metrics:** MongoDB Atlas, for example, can display metrics per appName, helping you analyze the behavior of different clients.
 
 #### 3.1.3. Common modifiers, helpers and methods for the mongosh
 
@@ -328,6 +346,12 @@ db.collection_name.deleteOne({...})
 db.hello() // provides some information about the role of the mongod instance we are connected to.
 db.collection.find() // Finds all documents in a collection
 db.collection.findOne({...}) // Finds an specific document in a collection
+```
+
+Example: Find a document with username of samantha27 and remove the account number from the accounts array on it
+
+```bash
+mongosh "mongodb+srv://myAtlasDBUser:myatlas-001@myatlasclusteredu.7so1q.mongodb.net/sample_analytics?appName=config-mongosh" --eval "db.customers.updateOne({username: 'samantha27'}, {\$pull:{accounts: 515170}})"
 ```
 
 ### 3.2. Configuring the MongoDB Shell
@@ -404,6 +428,7 @@ END
 - using the `--eval flag`
 - Passing commands or javascript code to `mongosh`
 - We can return the results of a query without entering the shell
+- we're using the `--nodb` flag to start the shell without requiring a connection string
 
 **Examples**
 
@@ -425,3 +450,151 @@ We can also pass variables directly to the shell via the `--eval` flag and the `
 ```bash
 mongosh --eval "var hello = 'hello world'" --shell
 ```
+
+### 3.3. Using the mongoDB Shell
+
+Key facts:
+
+- It's important to know the abiliy of mongosh to leverage javascript
+- In mongoDB is a good practice to use dates in the ISODate format
+
+> TO-DO: CHECK THE VIDEO AGAIN & ELLABORATE
+
+### 3.3.1. Code Summary: Using the MongoDB Shell
+
+The following sections explain how to use `mongosh` to run external scripts and to edit commands in an external editor.
+
+**Run External Scripts**
+
+To run an external script in mongosh, use the load() method. For example, to run the randomPost.js file, you would run the following code:
+
+```js
+load('randomPost.js')
+```
+
+Within your script, you can use the `db.getSiblingDB()` method to access a database without having to switch to it in `mongosh`. For example, here’s how you would access the sample_training database in the `randomPost.js` script:
+
+```js
+db = db.getSiblingDB("sample_training");
+console.log(`\nCurrent database: ${db.getName()}`);
+console.log("Random post sample of 500 words:\n");
+let result = db.posts.aggregate({
+ $sample: { size: 1 },
+});
+printjson(result.next().body.slice(0, 500) + " ...");
+```
+
+**Edit Commands in an External Editor**
+
+To edit a function or command in an external text editor, like Vim or nano, while using mongosh, use the edit command. To use this command, you must first set the config.editor value in mongosh. To do so, use the config.set() method:
+
+```js
+config.set("editor", "vim")
+```
+
+Once the editor is set, you can then use edit to modify a new or existing command. For example, to edit the giveMeADate function, you would run the following code:
+
+```sh
+edit giveMeADate
+```
+
+### 3.4. Using the MongoDB Shell Library (.mongoshrc.js)
+
+This file opens up all sorts of possibilities for adding functionality and customization. For example, we can use the the `.mongoshrc.js` to:
+
+- Add functionality to the MongoDB Shell (`mongosh`) with custom helper functions
+- Add custom helper functions and customize the prompt to include additional information about our database
+- On startup, mongosh checks our home directory got a hidden file called `.mongoshrc.js` and reads its contents before displaying a prompt for the first time
+
+#### 3.4.1. Add custom helper functions
+
+By using the `.mongoshrc.js` file we can add functionality to the MongoDB Shell (`mongosh`). For example, as a DBA we might want to check if a server is running a compatible version for a given client. For this we can use a built-in helper command called `db.adminCommand()` wich runs commands against the admin database.
+
+ - When you specify a command that you want to run against the admin database, the command should be passed as a document. The command name should be one of the keys on the document, and in most cases its value should be set to 1.
+ - To confirm this, you should always ______ the details of the command in question
+ - For commands that do not require additional parameters, we take a shortcut py passing the command name as a string instead of a document to `db.adminCommand()`
+
+   Example:
+
+   ```js
+   db.adminCommand({CommandName:1})
+   ```
+
+Now let's go back to checking the compatibilty version of the mongoDb server. This can help determininig if there will be issues with incompatible clients.
+
+Our command starts with `db.adminCommand`. Then we pass in the command document like this:
+
+```js
+test > db.adminCommand({getParameter: 1, featureCompatibilityVersion: 1})
+{featureCompatibilityVersion: { version: '5.0'}}
+```
+- the `getParameter` command is used to get specific values for a parameer by setting its value to 1.
+- The second field is the parameter value we want to retrieve. In this case we want the `featureCompatibilityVersion`, so we also set its value to one.
+
+After running this command, we can see that the ouput contains the `featureCompatibilityVersion` of the server
+
+But one issue is that the output of the command is pretty loing, so lets add a helper function to the `.mongoshrc.js` called `fcv()` to act as a shortcut. This will make running the command much easier. The `.mongoshrc.js` wont exist by default, so we should create it first:
+
+```bash
+$ touch ~/.mongoshrc.js
+$ vim ~/.mongoshrc.js
+```
+
+```js
+const fcv = () => db.adminCommand({getParameter: 1, featureCompatibilityVersion: 1})
+```
+
+Now we can test it, but first we need to restart the `mongosh`:
+
+```js
+$ mongosh
+test> fcv()
+{featureCompatibilityVersion: { version: '5.0'}}
+```
+
+We can see that we get the same result as if we ran the command directly, the only difrerence is only that this time we had much less to type.
+
+
+#### 3.4.2. Customize the mongosh prompt
+
+Helper functions are just one thing that we can add to the .mongoshrc.js file. Next we will customize our prompt.
+
+The default prompt some basic information, but we can use native methos on mongosh to get info about the mongodb server we're connected to and display it on the promt.
+
+For example, we'll add a function to our .mongoshrc.js called prompt. In the prompt function we'll add some varialbes to get information such as the name of the db, whetener we're connectyed to atlas, the name of the database, the read `reference and the current user to name a few.
+
+We can access this information by using the db object in mongosh. With these variables set, now al  we need to do is retiunr a string that contains the information for those variables.
+
+```bash
+$ touch ~/.mongoshrc.js
+$ vim ~/.mongoshrc.js
+```
+
+```js
+prompt = () => {
+ let returnString = "";
+ const dbName = db.getName();
+ const isEnterprise = db.serverBuildInfo().modules.includes("enterprise");
+ const mongoURL = db.getMongo()._uri.includes("mongodb.net");
+ const nonAtlasEnterprise = isEnterprise && !mongoURL;
+ const usingAtlas = mongoURL && isEnterprise;
+ const readPref = db.getMongo().getReadPrefMode();
+ const isLocalHost = /localhost|127\.0\.0\.1/.test(db.getMongo()._uri);
+ const currentUser = db.runCommand({ connectionStatus: 1 }).authInfo
+   .authenticatedUsers[0]?.user;
+ if (usingAtlas) {
+   returnString += `Atlas || ${dbName} || ${currentUser} || ${readPref} || =>`;
+ } else if (isLocalHost) {
+   returnString += `${
+     nonAtlasEnterprise ? "Enterprise || localhost" : "localhost"
+   } || ${dbName} || ${readPref} || =>`;
+ } else if (nonAtlasEnterprise) {
+   returnString += `Enterprise || ${dbName} || ${currentUser} || ${readPref} || =>`;
+ } else {
+   returnString += `${dbName} || ${readPref} || =>`;
+ }
+ return returnString;
+};
+```
+
+After returning these modifications, we restart the mongosh connect to atlas, and see that now the prompt shows the information we specified on the prompt function.
