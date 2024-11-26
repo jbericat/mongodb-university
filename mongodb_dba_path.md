@@ -460,7 +460,7 @@ Key facts:
 
 > TO-DO: CHECK THE VIDEO AGAIN & ELLABORATE
 
-### 3.3.x. Code Summary: Using the MongoDB Shell
+### 3.3.1. Code Summary: Using the MongoDB Shell
 
 The following sections explain how to use `mongosh` to run external scripts and to edit commands in an external editor.
 
@@ -497,3 +497,101 @@ Once the editor is set, you can then use edit to modify a new or existing comman
 ```sh
 edit giveMeADate
 ```
+
+### 3.4. Using the MongoDB Shell Library (.mongoshrc.js)
+
+This file opens up all sorts of possibilities for adding functionality and customization. For example, we can use the the `.mongoshrc.js` to:
+
+- Add functionality to the MongoDB Shell (`mongosh`) with custom helper functions
+- Add custom helper functions and customize the prompt to include additional information about our database
+- On startup, mongosh checks our home directory got a hidden file called `.mongoshrc.js` and reads its contents before displaying a prompt for the first time
+
+#### 3.4.1. Add custom helper functions
+
+By using the `.mongoshrc.js` file we can add functionality to the MongoDB Shell (`mongosh`). For example, as a DBA we might want to check if a server is running a compatible version for a given client. For this we can use a built-in helper command called `db.adminCommand()` wich runs commands against the admin database.
+
+ - When you specify a command that you want to run against the admin database, the command should be passed as a document. The command name should be one of the keys on the document, and in most cases its value should be set to 1.
+ - To confirm this, you should always ______ the details of the command in question
+ - For commands that do not require additional parameters, we take a shortcut py passing the command name as a string instead of a document to `db.adminCommand()`
+
+   Example:
+
+   ```js
+   db.adminCommand({CommandName:1})
+   ```
+
+Now let's go back to checking the compatibilty version of the mongoDb server. This can help determininig if there will be issues with incompatible clients.
+
+Our command starts with `db.adminCommand`. Then we pass in the command document like this:
+
+```js
+test > db.adminCommand({getParameter: 1, featureCompatibilityVersion: 1})
+{featureCompatibilityVersion: { version: '5.0'}}
+```
+- the `getParameter` command is used to get specific values for a parameer by setting its value to 1.
+- The second field is the parameter value we want to retrieve. In this case we want the `featureCompatibilityVersion`, so we also set its value to one.
+
+After running this command, we can see that the ouput contains the `featureCompatibilityVersion` of the server
+
+But one issue is that the output of the command is pretty loing, so lets add a helper function to the `.mongoshrc.js` called `fcv()` to act as a shortcut. This will make running the command much easier. The `.mongoshrc.js` wont exist by default, so we should create it first:
+
+```bash
+$ touch ~/.mongoshrc.js
+$ vim ~/.mongoshrc.js
+```
+
+```js
+const fcv = () => db.adminCommand({getParameter: 1, featureCompatibilityVersion: 1})
+```
+
+Now we can test it, but first we need to restart the `mongosh`:
+
+```js
+$ mongosh
+test> fcv()
+{featureCompatibilityVersion: { version: '5.0'}}
+```
+
+We can see that we get the same result as if we ran the command directly, the only difrerence is only that this time we had much less to type.
+
+
+#### 3.4.2. Customize the mongosh prompt
+
+Helper functions are just one thing that we can add to the .mongoshrc.js file. Next we will customize our prompt.
+
+The default prompt some basic information, but we can use native methos on mongosh to get info about the mongodb server we're connected to and display it on the promt.
+
+For example, we'll add a function to our .mongoshrc.js called prompt. In the prompt function we'll add some varialbes to get information such as the name of the db, whetener we're connectyed to atlas, the name of the database, the read `reference and the current user to name a few.
+
+We can access this information by using the db object in mongosh. With these variables set, now al  we need to do is retiunr a string that contains the information for those variables.
+
+```bash
+$ touch ~/.mongoshrc.js
+$ vim ~/.mongoshrc.js
+```
+
+```js
+prompt = () => {
+  let returnString = "";
+  const dbName = db.getName();
+  const isEnterprise = db.serverBuildInfo().modules.includes("enterprise");
+  const mongoURL = db.getMongo()._uri.includes("mongodb.net");
+  const nonAtlasEnterprise = isEnterprise && !mongoURL;
+  const usingAtlas = mongoURL && isEnterprise;
+  const readPref = db.getMongo().getReadPrefMode();
+  const isLocalHost = /localhost|127\.0\.0\.1/.test(db.getMongo()._uri);
+  const currentUSer = db.runCommand({ connectionStatus: 1}).authInfo.authenticatedUsers[0]?.user;
+  if (usingAtlas) {
+    returnString += `Atlas || ${dbName} || ${currentUser} || ${readPref} || =>`
+  } else if (isLocalHost) {
+    returnString += `${nonAtlasEnterprise ? "Enterprise || localhost" : "localhost" } || ${dbname} || ${readPref} || =>`
+  } else if (nonAtlasEnterprise) {
+    returnString += `Enterprise || ${dbname} || ${currentUser} || ${readPref} || =>`
+  } else {
+    returnString += `${dbname} || ${readPref} || =>`
+  }
+  return returnString;
+}
+```
+
+After returning these modifications, we restart the mongosh connect to atlas, and see that now the prompt shows the information we specified on the prompt function.
