@@ -250,9 +250,22 @@ It's not always easy to recognize these anti-patterns, but some of the tools ava
 - identifies unnecessary indexes
 - highlight issues with the schema
 
-## 3. The Mongodb Shell
+## 3. The MongoDB Shell
 
 > This information was obtained from https://learn.mongodb.com/learn/course/the-mongodb-shell
+
+
+
+In this unit, we'll learn how to:
+
+- Install the MongoDB Shell (mongosh) and connect to self-hosted and Atlas deployments
+- Configure mongosh by using the config API and setting options in the configuration file (mongosh.conf)
+- Pass command line arguments to mongosh
+- Write a JavaScript function inside mongosh
+- Use db.getSiblingDb() to change databases within a script by using the MongoDB Shell's load() method
+- Edit a function or variable from mongosh in an external text editor
+- Add a helper function to .mongoshrc.js to add functionality to the MongoDB Shell
+- Add information to the mongosh prompt by editing the .mongoshrc.js file
 
 ### 3.1. Installing and Connecting to the MongoDB Shell
 
@@ -598,3 +611,93 @@ prompt = () => {
 ```
 
 After returning these modifications, we restart the mongosh connect to atlas, and see that now the prompt shows the information we specified on the prompt function.
+
+### 3.5. MongoDB Shell Tips and Tricks
+
+The following sections explain some tips and tricks for using mongosh.
+
+#### 3.5.1. Use Node.js APIs to Read and Write Files
+
+`mongosh` provides access to all native Node.js APIs, including the file system module, or `fs`. This means that you can use `mongosh` to read and write files. In the following example, we assign the result of a query to a variable called `customers` so that it can be used later:
+
+```js
+const customers = db.sales.find({}, {customer: 1, _id: 0})
+```
+
+Next, we use the `fs` module to write the results of the query to a file called `customers.json`. To do this, we pass in the customers variable and use the `EJSON.stringify()` method to convert the array to a string. We also use the `null` and `2` parameters to format the output so that it’s easier to read:
+
+```sh
+fs.writeFileSync('customers.json', EJSON.stringify(customers.toArray()), null, 2)
+```
+
+### 3.5.2. Generate Seed Data
+
+You can also use `npm` packages in `mongosh`, as they support external scripts and `require` statements. In the following example, we use the faker package to generate an array of 10 fake users. We then insert the users as documents into a new database.
+
+```js
+const { faker } = require("@faker-js/faker");
+const users = [];
+for (let i = 0; i < 10; i++) {
+ users.push({
+   name: faker.person.fullName(),
+   email: faker.internet.email(),
+   phone: faker.phone.number(),
+ });
+}
+
+console.log("Inserting fake users ...");
+db.getSiblingDB("test_data").users.insertMany(users);
+```
+
+**Note:** To use the faker package, you must first install it by using `npm install @faker-js/faker --save-dev` in the same directory as your external script. Or, you can install the package globally by using `npm install -g @faker-js/faker`.
+
+#### 3.6. Complementary resources
+
+****Table of Contents**
+
+Use the following resources to learn more about how to install, use, and customize the MongoDB Shell, or mongosh.
+
+**General**
+
+- [Getting Started with MongoDB Atlas](https://learn.mongodb.com/courses/getting-started-with-mongodb-atlas)
+- [mongodb-js/mongosh (GitHub)](https://github.com/mongodb-js/mongosh)
+
+**Lesson 1: Installing and Connecting to the MongoDB Shell**
+
+- [Install mongosh](https://www.mongodb.com/docs/mongodb-shell/install/)
+- [Connect to a Deployment](https://www.mongodb.com/docs/mongodb-shell/connect/)
+- [Connect to a Database Deployment (for Atlas)](https://www.mongodb.com/docs/atlas/connect-to-database-deployment/)
+- [MongoDB Shell Options](https://www.mongodb.com/docs/mongodb-shell/reference/options/)
+  - [Host](https://www.mongodb.com/docs/mongodb-shell/reference/options/#std-option-mongosh.--host)
+  - [Port](https://www.mongodb.com/docs/mongodb-shell/reference/options/#std-option-mongosh.--port)
+  - [Username](https://www.mongodb.com/docs/mongodb-shell/reference/options/#std-option-mongosh.--username)
+
+**Lesson 2: Configuring the MongoDB Shell**
+
+- [Configure mongosh](https://www.mongodb.com/docs/mongodb-shell/configure-mongosh/)
+- [Configure Settings Using the API](https://www.mongodb.com/docs/mongodb-shell/reference/configure-shell-settings-api/#std-label-configure-settings-api)
+- [Configure Settings Using a Configuration File](https://www.mongodb.com/docs/mongodb-shell/reference/configure-shell-settings-global/#std-label-configure-settings-global)
+- [Configure Settings](https://www.mongodb.com/docs/mongodb-shell/reference/configure-shell-settings/#std-label-mongosh-shell-settings)
+
+**Lesson 3: Using the MongoDB Shell**
+
+- [Write Scripts](https://www.mongodb.com/docs/mongodb-shell/write-scripts/)
+- [db.getSiblingDB()](https://www.mongodb.com/docs/manual/reference/method/db.getSiblingDB/)
+- [Use an Editor for Commands](https://www.mongodb.com/docs/mongodb-shell/reference/editor-mode/)
+- [Gist for randomPost.js](https://gist.github.com/nol166/298d1c0f02fb1837f546e16163e097f5)
+- [Gist for giveMeADate.js](https://gist.github.com/nol166/16565bcf9705e086aac6e80a44254e16)
+
+**Lesson 4: Using the MongoDB Shell Library (.mongoshrc.js)**
+
+- [Run Code From a Configuration File](https://www.mongodb.com/docs/mongodb-shell/write-scripts/#std-label-mongosh-write-scripts-config-file)
+- [Customize the mongosh Prompt](https://www.mongodb.com/docs/mongodb-shell/reference/customize-prompt/#std-label-customize-the-mongosh-prompt)
+- [Gist for featureCompatibityVersion Helper (.mongoshrc.js)](https://gist.github.com/nol166/63d84e25f4de0a27a0e0b93c284f8295)
+- [Gist for Additional Information in the mongosh Prompt (.mongoshrc.js)](https://gist.github.com/nol166/c93e1b52b31488f7a17b50e0f66114ea)
+
+**Lesson 5: MongoDB Shell Tips and Tricks**
+
+- [MongoDB Shell Tips and Tricks](https://dev.to/mongodb/mongodb-shell-tips-and-tricks-1ceg)
+- [writeFileSync() (Node.js Documentation)](https://nodejs.org/api/fs.html#fswritefilesyncfile-data-options)
+- [Faker npm Package](https://fakerjs.dev/guide/)
+- [load() in mongosh](https://www.mongodb.com/docs/v5.2/reference/method/load/)
+- [require() in mongosh](https://www.mongodb.com/docs/mongodb-shell/write-scripts/require-external-modules/#require-a-local-file)
