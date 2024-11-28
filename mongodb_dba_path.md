@@ -267,55 +267,6 @@ In this unit, we'll learn how to:
 - Add a helper function to .mongoshrc.js to add functionality to the MongoDB Shell
 - Add information to the mongosh prompt by editing the .mongoshrc.js file
 
-**Table of Contents**
-
-Use the following resources to learn more about how to install, use, and customize the MongoDB Shell, or mongosh.
-
-**General**
-
-- [Getting Started with MongoDB Atlas](https://learn.mongodb.com/courses/getting-started-with-mongodb-atlas)
-- [mongodb-js/mongosh (GitHub)](https://github.com/mongodb-js/mongosh)
-
-**Lesson 1: Installing and Connecting to the MongoDB Shell**
-
-- Install mongosh
-- Connect to a Deployment
-- Connect to a Database Deployment (for Atlas)
-- MongoDB Shell Options
-  - Host
-  - Port
-  - Username
-
-**Lesson 2: Configuring the MongoDB Shell**
-
-- Configure mongosh
-- Configure Settings Using the API
-- Configure Settings Using a Configuration File
-- Configure Settings
-
-**Lesson 3: Using the MongoDB Shell**
-
-- Write Scripts
-- db.getSiblingDB()
-- Use an Editor for Commands
-- Gist for randomPost.js
-- Gist for giveMeADate.js
-
-**Lesson 4: Using the MongoDB Shell Library (.mongoshrc.js)**
-
-- Run Code From a Configuration File
-- Customize the mongosh Prompt
-- Gist for featureCompatibityVersion Helper (.mongoshrc.js)
-- Gist for Additional Information in the mongosh Prompt (.mongoshrc.js)
-
-**Lesson 5: MongoDB Shell Tips and Tricks**
-
-- MongoDB Shell Tips and Tricks
-- writeFileSync() (Node.js Documentation)
-- Faker npm Package
-- load() in mongosh
-- require() in mongosh
-
 ### 3.1. Installing and Connecting to the MongoDB Shell
 
 First we'll learn how to install the `mongosh` in an ubuntu OS and then we'll connect to an Atlas cluster.
@@ -700,4 +651,53 @@ db.getSiblingDB("test_data").users.insertMany(users);
 
 **Note:** To use the faker package, you must first install it by using `npm install @faker-js/faker --save-dev` in the same directory as your external script. Or, you can install the package globally by using `npm install -g @faker-js/faker`.
 
-#### 3.6
+#### 3.6. Complementary resources
+
+****Table of Contents**
+
+Use the following resources to learn more about how to install, use, and customize the MongoDB Shell, or mongosh.
+
+**General**
+
+- [Getting Started with MongoDB Atlas](https://learn.mongodb.com/courses/getting-started-with-mongodb-atlas)
+- [mongodb-js/mongosh (GitHub)](https://github.com/mongodb-js/mongosh)
+
+**Lesson 1: Installing and Connecting to the MongoDB Shell**
+
+- [Install mongosh](https://www.mongodb.com/docs/mongodb-shell/install/)
+- [Connect to a Deployment](https://www.mongodb.com/docs/mongodb-shell/connect/)
+- [Connect to a Database Deployment (for Atlas)](https://www.mongodb.com/docs/atlas/connect-to-database-deployment/)
+- [MongoDB Shell Options](https://www.mongodb.com/docs/mongodb-shell/reference/options/)
+  - [Host](https://www.mongodb.com/docs/mongodb-shell/reference/options/#std-option-mongosh.--host)
+  - [Port](https://www.mongodb.com/docs/mongodb-shell/reference/options/#std-option-mongosh.--port)
+  - [Username](https://www.mongodb.com/docs/mongodb-shell/reference/options/#std-option-mongosh.--username)
+
+**Lesson 2: Configuring the MongoDB Shell**
+
+- [Configure mongosh](https://www.mongodb.com/docs/mongodb-shell/configure-mongosh/)
+- [Configure Settings Using the API](https://www.mongodb.com/docs/mongodb-shell/reference/configure-shell-settings-api/#std-label-configure-settings-api)
+- [Configure Settings Using a Configuration File](https://www.mongodb.com/docs/mongodb-shell/reference/configure-shell-settings-global/#std-label-configure-settings-global)
+- [Configure Settings](https://www.mongodb.com/docs/mongodb-shell/reference/configure-shell-settings/#std-label-mongosh-shell-settings)
+
+**Lesson 3: Using the MongoDB Shell**
+
+- [Write Scripts](https://www.mongodb.com/docs/mongodb-shell/write-scripts/)
+- [db.getSiblingDB()](https://www.mongodb.com/docs/manual/reference/method/db.getSiblingDB/)
+- [Use an Editor for Commands](https://www.mongodb.com/docs/mongodb-shell/reference/editor-mode/)
+- [Gist for randomPost.js](https://gist.github.com/nol166/298d1c0f02fb1837f546e16163e097f5)
+- [Gist for giveMeADate.js](https://gist.github.com/nol166/16565bcf9705e086aac6e80a44254e16)
+
+**Lesson 4: Using the MongoDB Shell Library (.mongoshrc.js)**
+
+- [Run Code From a Configuration File](https://www.mongodb.com/docs/mongodb-shell/write-scripts/#std-label-mongosh-write-scripts-config-file)
+- [Customize the mongosh Prompt](https://www.mongodb.com/docs/mongodb-shell/reference/customize-prompt/#std-label-customize-the-mongosh-prompt)
+- [Gist for featureCompatibityVersion Helper (.mongoshrc.js)](https://gist.github.com/nol166/63d84e25f4de0a27a0e0b93c284f8295)
+- [Gist for Additional Information in the mongosh Prompt (.mongoshrc.js)](https://gist.github.com/nol166/c93e1b52b31488f7a17b50e0f66114ea)
+
+**Lesson 5: MongoDB Shell Tips and Tricks**
+
+- [MongoDB Shell Tips and Tricks](https://dev.to/mongodb/mongodb-shell-tips-and-tricks-1ceg)
+- [writeFileSync() (Node.js Documentation)](https://nodejs.org/api/fs.html#fswritefilesyncfile-data-options)
+- [Faker npm Package](https://fakerjs.dev/guide/)
+- [load() in mongosh](https://www.mongodb.com/docs/v5.2/reference/method/load/)
+- [require() in mongosh](https://www.mongodb.com/docs/mongodb-shell/write-scripts/require-external-modules/#require-a-local-file)
