@@ -630,7 +630,7 @@ Next, we use the `fs` module to write the results of the query to a file called 
 fs.writeFileSync('customers.json', EJSON.stringify(customers.toArray()), null, 2)
 ```
 
-### 3.5.2. Generate Seed Data
+#### 3.5.2. Generate Seed Data
 
 You can also use `npm` packages in `mongosh`, as they support external scripts and `require` statements. In the following example, we use the faker package to generate an array of 10 fake users. We then insert the users as documents into a new database.
 
@@ -651,7 +651,7 @@ db.getSiblingDB("test_data").users.insertMany(users);
 
 **Note:** To use the faker package, you must first install it by using `npm install @faker-js/faker --save-dev` in the same directory as your external script. Or, you can install the package globally by using `npm install -g @faker-js/faker`.
 
-#### 3.6. Complementary resources
+### 3.6. Complementary resources
 
 ****Table of Contents**
 
@@ -701,3 +701,154 @@ Use the following resources to learn more about how to install, use, and customi
 - [Faker npm Package](https://fakerjs.dev/guide/)
 - [load() in mongosh](https://www.mongodb.com/docs/v5.2/reference/method/load/)
 - [require() in mongosh](https://www.mongodb.com/docs/mongodb-shell/write-scripts/require-external-modules/#require-a-local-file)
+
+## 4. Connecting to a MongoDB Database
+
+In this unit, you will learn where to find your Atlas connection string inside of the Atlas dashboard. You'll also learn about the components of a Atlas connection string. Finally, you will have the opportunity to use your connection string to connect your Atlas cluster with the shell, Compass, and any type of application.
+
+### 4.1 Using MongoDB Connection Strings
+
+#### 4.1.1. Introduction
+
+In this lesson we'll learn:
+
+- How to use the mongoDB connection string
+- Where locate the mongoDB connection string for an Atlas cluster
+- What the string consists of
+
+The mongoDB connection string allows us to connect to our cluster and work with our data. It describes a host that we'll be using and the options for connecting to a mongoDB database. For example, the con string can be used to connect from:
+
+- The mongoDB shell
+- MongoDB Compass
+- Any other application
+
+#### 4.1.2. Connection string formats
+
+MongoDB provides 2 formats for the connection string:
+
+- **A standard format:** Used to connect to standalone clusters, replica sets, or sharded clusters
+- **A DNS seed list format:** Was released in mongoDB 3.6 and allows us to provide a DNS server list to our connection stream, which gives us a lot more flexibility with our deployment and the ability to change servers in our rotation without reconfiguring any of our clients. It's used by the connection string from the Atlas dashboard and has a list of hosts we can connect to.
+
+#### 4.1.3. Connection String components
+
+At first glance, the connection string appears to be a very long string of characters, but we can break it down into several components:
+
+```bash
+mongodb+srv://<username>:<password>@cluster0.usqsf.mongodb.net/?retryWrites=true&w=majority
+```
+
+- **"mongodb" required prefix:** It identifies it as a mongoDB connection string.
+- **"srv" edition:** Automatically sets the TLS security option to true and tells MongoDB to use the DNS seed list.
+- **username & password:** Following the MongoDB prefix, there's the username and password that we created for our database in the Atlas dashboard
+- **Host and optional port number:** If the port number is not specified, MongoDB will default to port 27017
+ **Options:** The final piece of the connection string includes any options we want to include, such as:
+  - Connection timeout
+  - TLS/SSL
+  - Connection pooling
+  - R/W concerns
+  - other options like "retryWrites", which tells MongoDB drivers to automatically retry when certain types of write operations fail (MongoDB has options for just about anything we may need when it comes out to connecting to a database).
+
+### 4.2. Connecting to a MongoDB Atlas Cluster with the Shell
+
+In this lesson we'll learn to connect to our cluster via the MongoDB shell using our application string. We'll also larn about the node.js `REPL` (Read-Eval-Print-Loop) environment that's used by the MongoDB shell.
+
+The MongoDB shell is a Node.js `REPL` environment. This gives us access to the following mechanisms from within the shell:
+
+- JavaScript variables
+- Functions
+- Conditionals
+- Loops
+- Control flow statements
+
+For example, we'll create a variable for an array of strings:
+
+```js
+prompt> const GreetingArray = ["Hello","World","Welcome"];
+```
+
+Now we'll create another variable for a function that will loop over the array variable and print-out each one of the elements.
+
+```js
+prompt> const loopArray = (array) => array.forEach(el => console.log(el));
+```
+
+Now we can use the loopArray function with our greetingArray as the argument to console out the elements of the array:
+
+```js
+prompt> loopArray(greetingArray);
+```
+
+Summing-up, we can definitely leverage many of the elements from javascript in the mongoDB shell.
+
+### 4.3. Connecting to a MongoDB Atlas Cluster with Compass
+
+In this lesson we'll learn how to use a connection string with MongoDB Compass to connect to our cluster. We'll also take a quick tour of Compass and show how to use it to view and interact with our data.
+
+MongoDB Compass is a graphical user interface or GUI that allows us to query and analyze our data, and compose aggregation pipelines.
+
+We can use our connection string with Compass to connect to an Atlas cluster
+
+### 4.4. Connecting to a MongoDB Atlas Cluster from an Application
+
+In this lesson we'll learn about MongoDB drivers, as well as where to find the documentation we need to use these drivers.
+
+MongoDB drivers allow an application to connect to the database using the programming language of our choice.
+
+Our driver uses a connection string to connect to our cluster. For a list of languages supported by MongoDB we can go to https://mongodb.com/docs/drivers
+
+### 4.5. Troubleshooting MongoDB Atlas Connection Errors
+
+In this lesson we're going to learn how to troubleshoot two of the most common connection errors. These errors can cause frustration for many developers, but they are fairly easy to diagnose and fix. We'll cover what causes these errors, how they behave, and how to fix them.
+
+Connection issues area a failure of our application to connect to our mongoDB database, and most of them stem from barriers put up by MongoDB to secure our data.
+
+#### 4.5.1. Network access errors
+
+**IP Not allowed Error:**
+
+```js
+MongoServerSelectionError: connection <monitor> to IP:27017 closed
+```
+
+**Fix:**
+
+We can whitelist either temporarily or permanently an IP address to Atlas in the `security > Network` access list
+
+#### 4.5.2. User authentication errors
+
+**Authentication failed error:**
+
+MongoDB does not autofill our password filed in the connection string, so make sure the password is populated and correct before connecting.
+
+```js
+MongoServerError: bad auth : Authentication failed.
+```
+
+> Notice that an authentication error might be triggered if any other part of the connection string was not properly typed, so make sure the connection string is exactly what we copied from the Atlas website.
+
+#### 4.6. Resources
+
+Resources
+
+Use the following resources to learn more about connecting to your database.
+
+**Lesson 01: Using MongoDB Connection Strings**
+
+- MongoDB Docs: [Get Connection String](https://www.mongodb.com/docs/guides/atlas/connection-string/?_ga=2.2826361.818394043.1666026366-33697719.1666026366)
+- MongoDB Docs: [Connection String URI Format](https://www.mongodb.com/docs/manual/reference/connection-string/)
+
+**Lesson 02: Connecting to a MongoDB Atlas Cluster with the Shell**
+
+- MongoDB Docs: [The MongoDB Shell](https://www.mongodb.com/docs/mongodb-shell/)
+
+**Lesson 03: Connecting to a MongoDB Atlas Cluster with Compass**
+
+- MongoDB Docs: [MongoDB Compass](https://www.mongodb.com/products/compass/)
+
+**Lesson 04: Connecting to a MongoDB Atlas Cluster from an Application**
+
+- MongoDB Docs: [Connect via Your Application](https://www.mongodb.com/docs/atlas/driver-connection/)
+
+**Lesson 05: Troubleshooting MongoDB Atlas Connection Errors**
+
+- MongoDB Docs: [Troubleshoot Connection Issues](https://www.mongodb.com/docs/atlas/troubleshoot-connection/)
