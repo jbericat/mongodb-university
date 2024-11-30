@@ -84,7 +84,7 @@ Benfits:
 
 ### 2.3. Modeling Data Relationships
 
-### 2.3.1. Embedding
+#### 2.3.1. Embedding
 
 We can implement one to many using nested dictionaries (which in mdb is called "sub-document embedding" or simply "nested documents"), like:
 
@@ -473,7 +473,7 @@ Key facts:
 
 > TO-DO: CHECK THE VIDEO AGAIN & ELLABORATE
 
-### 3.3.1. Code Summary: Using the MongoDB Shell
+#### 3.3.1. Code Summary: Using the MongoDB Shell
 
 The following sections explain how to use `mongosh` to run external scripts and to edit commands in an external editor.
 
@@ -826,7 +826,7 @@ MongoServerError: bad auth : Authentication failed.
 
 > Notice that an authentication error might be triggered if any other part of the connection string was not properly typed, so make sure the connection string is exactly what we copied from the Atlas website.
 
-#### 4.6. Resources
+### 4.6. Resources
 
 Resources
 
@@ -852,3 +852,5 @@ Use the following resources to learn more about connecting to your database.
 **Lesson 05: Troubleshooting MongoDB Atlas Connection Errors**
 
 - MongoDB Docs: [Troubleshoot Connection Issues](https://www.mongodb.com/docs/atlas/troubleshoot-connection/)
+
+## 5.
