@@ -1051,7 +1051,7 @@ db.sales.find({
 
 Review the following logical operators: implicit `$and`, `$or`, and `$and`.
 
-#### 5.5.1. Find a Document by Using Implicit $and
+#### 5.5.1. Find a Document by Using Implicit $**and**
 
 Use implicit $and to select documents that match multiple expressions. For example:
 
@@ -1064,7 +1064,7 @@ db.routes.find({ "airline.name": "Southwest Airlines", stops: { $gte: 1 } })
 Use the $or operator to select documents that match at least one of the included expressions. For example:
 
 ```js
-db.routes.find({
+db.routes.find({****
   $or: [{ dst_airport: "SEA" }, { src_airport: "SEA" }],
 })
 ```
@@ -1085,28 +1085,276 @@ db.routes.find({
 ### 5.6. Resources
 
 Use the following resources to learn more about inserting and finding documents in MongoDB:
-Lesson 1 - Inserting Documents
 
-    MongoDB Docs: insertOne()
+**Lesson 1 - Inserting Documents**
 
-    MongoDB Docs: insertMany()
+- MongoDB Docs: [insertOne()](https://docs.mongodb.com/manual/reference/method/db.collection.insertOne/)
+- MongoDB Docs: [insertMany()](https://docs.mongodb.com/manual/reference/method/db.collection.insertMany/)
 
-Lesson 2 - Finding Documents
+**Lesson 2 - Finding Documents**
 
-    MongoDB Docs: find()
+- MongoDB Docs: [find()](https://docs.mongodb.com/manual/reference/method/db.collection.find/)
+- MongoDB Docs: [$in](https://docs.mongodb.com/manual/reference/operator/query/in/)
 
-    MongoDB Docs: $in
+**Lesson 3 - Finding Documents Using Comparison Operators**
 
-Lesson 3 - Finding Documents Using Comparison Operators
+- MongoDB Docs: [Comparison Operators](https://docs.mongodb.com/manual/reference/operator/query-comparison/)
 
-    MongoDB Docs: Comparison Operators
+**Lesson 4 - Querying on Array Elements**
 
-Lesson 4 - Querying on Array Elements
+- MongoDB Docs: [$elemMatch](https://docs.mongodb.com/manual/reference/operator/query/elemMatch/)
+- MongoDB Docs: [Querying Arrays](https://docs.mongodb.com/manual/tutorial/query-array-of-documents/#combination-of-elements-satisfies-the-criteria)
 
-    MongoDB Docs: $elemMatch
+**Lesson 5 - Finding Documents Using Logical Operators**
 
-    MongoDB Docs: Querying Arrays
+- MongoDB Docs: [Logical Operators](https://docs.mongodb.com/manual/reference/operator/query-logical/)
 
-Lesson 5 - Finding Documents Using Logical Operators
+## 6. MongoDB CRUD Operations: Replace and Delete Documents
 
-    MongoDB Docs: Logical Operators
+In this unit, we'll learn how to update, replace, and delete documents in MongoDB. These commands will help you manipulate data in your database and will prepare you to build MongoDB into your own apps. We will replace entire documents, update individual fields in a document, insert new documents, and remove documents from a database. By the end of this unit, you'll be able to execute most of the common database operations.
+
+### 6.1. Replacing a Document in MongoDB
+
+To replace documents in MongoDB, we use the `replaceOne()` method. The `replaceOne()` method takes the following parameters:
+
+- `filter`: A query that matches the document to replace.
+- `replacement`: The new document to replace the old one with.
+- `options`: An object that specifies options for the update.
+
+In the next example, we use the `_id` field to filter the document. In our replacement document, we provide the entire document that should be inserted in its place:
+
+```js
+db.books.replaceOne(
+  {
+    _id: ObjectId("6282afeb441a74a98dbbec4e"),
+  },
+  {
+    title: "Data Science Fundamentals for Python and MongoDB",
+    isbn: "1484235967",
+    publishedDate: new Date("2018-5-10"),
+    thumbnailUrl:
+      "https://m.media-amazon.com/images/I/71opmUBc2wL._AC_UY218_.jpg",
+    authors: ["David Paper"],
+    categories: ["Data Science"],
+  }
+)
+```
+
+### 6.2. Updating MongoDB Documents by Using updateOne()
+
+The `updateOne()` method accepts a filter document, an update document, and an optional options object. MongoDB provides update operators and options to help you update documents. In this section, we'll cover three of them: `$set`, `upsert`, and `$push`.
+
+
+#### 6.2.1. Replaces the value of a field with the specified value ($set)
+
+The `$set` operator replaces the value of a field with the specified value, as shown in the following code:
+
+```js
+db.podcasts.updateOne(
+  {
+    _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8"),
+  },
+  {
+    $set: {
+      subscribers: 98562,
+    },
+  }
+)
+```
+
+#### 6.2.2. Create a new document if no documents match the filtered criteria (upsert)
+
+The `upsert` option creates a new document if no documents match the filtered criteria. Here's an example:
+
+```js
+db.podcasts.updateOne(
+  { title: "The Developer Hub" },
+  { $set: { topics: ["databases", "MongoDB"] } },
+  { upsert: true }
+)
+```
+
+#### 6.2.3. Add a new value to the hosts array field ($push)
+
+The `$push` operator adds a new value to the hosts array field. Here's an example:
+
+```js
+db.podcasts.updateOne(
+  { _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8") },
+  { $push: { hosts: "Nic Raboy" } }
+)
+```
+
+### 6.3. Updating MongoDB Documents by Using findAndModify()
+
+The `findAndModify()` method is used to find and replace a single document in MongoDB. It accepts a filter document, a replacement document, and an optional options object. The following code shows an example:
+
+```js
+db.podcasts.findAndModify({
+  query: { _id: ObjectId("6261a92dfee1ff300dc80bf1") },
+  update: { $inc: { subscribers: 1 } },
+  new: true,
+})
+```
+
+### 6.4. Updating MongoDB Documents by Using updateMany()
+
+To update multiple documents, use the `updateMany()` method. This method accepts a **filter document**, an **update document**, and an optional **options object**. The following code shows an example:
+
+```js
+db.books.updateMany(
+  { publishedDate: { $lt: new Date("2019-01-01") } },
+  { $set: { status: "LEGACY" } }
+)
+```
+
+> **When to use `updateMany()`:**
+>
+> - Is not an all-or-nothing operation (**is not atomic**), which means that if an operation fails, the method will not rollback the updates, so only some documents might be updated. If that happens, we might have to run the method again.
+> - `updateMany()` **lacks isolation**, which means that updates will be visible as soon as they are performed. Because of this, this method is not appropiate for some use cases that may be essential for business requirements, such as financial transactions.
+
+#### 6.4.1. Lab practice
+
+##### Updating Multiple Documents
+
+Imagine you’re working with a research who asked you to update the last_seen field value of the `birds` collection for a few different species at once.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bird_data` database. Use the `birds` collection for this lab.
+
+**Lab Instructions**
+
+1. Update the last_seen date to 2022-01-01 for Blue Jay and Grackle in the birds collection.
+
+```js
+bird_data> db.birds.updateMany(
+	{ common_name: { $in: ["Blue Jay", "Grackle"] }},
+  { $set: { last_seen: new ISODate("2022-01-01") }})
+
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 2,
+  modifiedCount: 2,
+  upsertedCount: 0
+}
+
+db.birds.find({common_name: {$in: ["Blue Jay","Grackle"]}})
+[
+  {
+    _id: ObjectId('6286a5612f3fa87b7d86dcd2'),
+    common_name: 'Grackle',
+    scientific_name: 'Quiscalus quiscula',
+    wingspan_cm: 28.04,
+    habitat: 'pine trees',
+    diet: [ 'insects', 'minnows', 'eggs' ],
+    sightings_count: 7,
+    last_seen: ISODate('2022-05-19T20:20:44.083Z')
+  },
+  {
+    _id: ObjectId('628682d92f3fa87b7d86dcce'),
+    common_name: 'Blue Jay',
+    scientific_name: 'Cyanocitta cristata',
+    wingspan_cm: 34.17,
+    habitat: 'forests',
+    diet: [ 'vegetables', 'nuts', 'grains' ],
+    sightings_count: 4,
+    last_seen: ISODate('2022-05-19T20:20:44.083Z')
+  }
+]
+```
+
+### 6.5. Deleting Documents in MongoDB
+
+To delete documents, we use the `deleteOne()` or `deleteMany()` methods. Both methods accept a filter document and an options object.
+
+#### 6.5.1. Delete One Document
+
+The following code shows an example of the `deleteOne()` method:
+
+```js
+db.podcasts.deleteOne({ _id: Objectid("6282c9862acb966e76bbf20a") })
+```
+
+#### 6.5.2. Delete Many Documents
+
+The following code shows an example of the `deleteMany()` method:
+
+```js
+db.podcasts.deleteMany({category: "crime"})
+```
+
+#### 6.5.3. Lab practice
+
+##### Delete a Single Document
+
+In this activity we will delete one document from the `birds` collection.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bird_data` database. Use the `birds` collection for this lab.
+
+**Lab Instructions**
+
+1. Delete one document from the birds collection that matches the id `ObjectId("62cddf53c1d62bc45439bebf")`
+
+```js
+db.birds.deleteOne({_id: ObjectId("62cddf53c1d62bc45439bebf")})
+
+{ acknowledged: true, deletedCount: 1 }
+```
+
+##### Delete Multiple Documents
+
+In this activity we will delete multiple documents from the `birds` collection.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bird_data` database. Use the `birds` collection for this lab.
+
+**Lab Instructions**
+
+1. Delete all documents in the `birds` collection that have a `sightings_count` of less than or equal to `10`.
+
+```js
+db.birds.deleteMany({sightings_count: {$lte: 10} })
+
+{ acknowledged: true, deletedCount: 3 }
+```
+
+### 6.6. Conclusion
+
+#### 6.6.1. Summary
+
+In this unit, you learned how to modify query results with MongoDB. Specifically, you:
+
+- Replaced a single document by using `db.collection.replaceOne()`.
+- Updated a field value by using the `$set` update operator in db.`collection.updateOne()`.
+- Added a value to an array by using the $push update operator in db.`collection.updateOne()`.
+- Added a new field value to a document by using the upsert option in `db.collection.updateOne()`.
+- Found and modified a document by using `db.collection.findAndModify()`.
+- Updated multiple documents by using `db.collection.updateMany()`.
+- Deleted a document by using `db.collection.deleteOne()`.
+
+#### 6.6.2. Resources
+
+Use the following resources to learn more about modifying query results in MongoDB:
+
+**Lesson 01: Replacing a Document in MongoDB**
+
+- MongoDB Docs: [replaceOne()](https://www.mongodb.com/docs/manual/reference/method/db.collection.replaceOne/?_ga=2.56665699.810066485.1665291537-836515500.1666025886)
+
+**Lesson 02: Updating MongoDB Documents by Using `updateOne()`**
+
+- MongoDB Docs: [Update Operators](https://www.mongodb.com/docs/manual/reference/operator/update/?_ga=2.56665699.810066485.1665291537-836515500.1666025886)
+- MongoDB Docs: [$set](https://docs.mongodb.com/manual/reference/operator/update/set/?_ga=2.56665699.810066485.1665291537-836515500.1666025886)
+- MongoDB Docs: [$push](https://docs.mongodb.com/manual/reference/operator/update/push/?_ga=2.34644840.810066485.1665291537-836515500.1666025886)
+- MongoDB Docs: [upsert](https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/write-operations/upsert/?_ga=2.123127490.810066485.1665291537-836515500.1666025886)
+
+**Lesson 03: Updating MongoDB Documents by Using `findAndModify()`**
+
+- MongoDB Docs: [findAndModify()](https://www.mongodb.com/docs/manual/reference/method/db.collection.findAndModify/?_ga=2.123127490.810066485.1665291537-836515500.1666025886)
+
+**Lesson 04: Updating MongoDB Documents by Using `updateMany()`**
+
+- MongoDB Docs: [updateMany()](https://www.mongodb.com/docs/manual/reference/method/db.collection.updateMany/?_ga=2.123127490.810066485.1665291537-836515500.1666025886)
+
+**Lesson 05: Deleting Documents in MongoDB**
+
+- MongoDB Docs: [deleteOne()](https://www.mongodb.com/docs/v5.3/reference/method/db.collection.deleteOne/)
+- MongoDB Docs: [deleteMany()](https://www.mongodb.com/docs/v5.3/reference/method/db.collection.deleteMany/?_ga=2.23103219.810066485.1665291537-836515500.1666025886)
