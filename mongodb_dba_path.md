@@ -853,4 +853,260 @@ Use the following resources to learn more about connecting to your database.
 
 - MongoDB Docs: [Troubleshoot Connection Issues](https://www.mongodb.com/docs/atlas/troubleshoot-connection/)
 
-## 5.
+## 5. MongoDB CRUD Operations: Insert and Find Documents
+
+**Unit Overview**
+
+In this unit, you will be introduced to `CRUD` operations in MongoDB by inserting and finding documents. Inserting and finding documents will help you discover the ease and usability of MongoDB. You'll also build your own queries that use comparison and logical operators. Using operators will make your queries more precise and, in turn, make your application easier to develop. Finally, you'll learn how to query elements in an array. Arrays are a crucial data type that you will encounter frequently, so it's important that you have a solid understanding of how to work with them.
+
+### 5.1. Inserting Documents in a MongoDB Collection
+
+The following code demonstrates how to insert a single document and multiple documents into a collection.
+
+#### 5.1.1. Insert a Single Document
+
+Use `insertOne()` to insert a document into a collection. Within the parentheses of `insertOne()`, include an object that contains the document data. Here's an example:
+
+```js
+db.grades.insertOne({
+  student_id: 654321,
+  products: [
+    {
+      type: "exam",
+      score: 90,
+    },
+    {
+      type: "homework",
+      score: 59,
+    },
+    {
+      type: "quiz",
+      score: 75,
+    },
+    {
+      type: "homework",
+      score: 88,
+    },
+  ],
+  class_id: 550,
+})
+```
+
+#### 5.1.2. Insert Multiple Documents
+
+Use `insertMany()` to insert multiple documents at once. Within `insertMany()`, include the documents within an array. Each document should be separated by a comma. Here's an example:
+
+```js
+db.grades.insertMany([
+  {
+    student_id: 546789,
+    products: [
+      {
+        type: "quiz",
+        score: 50,
+      },
+      {
+        type: "homework",
+        score: 70,
+      },
+      {
+        type: "quiz",
+        score: 66,
+      },
+      {
+        type: "exam",
+        score: 70,
+      },
+    ],
+    class_id: 551,
+  },
+  {
+    student_id: 777777,
+    products: [
+      {
+        type: "exam",
+        score: 83,
+      },
+      {
+        type: "quiz",
+        score: 59,
+      },
+      {
+        type: "quiz",
+        score: 72,
+      },
+      {
+        type: "quiz",
+        score: 67,
+      },
+    ],
+    class_id: 550,
+  },
+  {
+    student_id: 223344,
+    products: [
+      {
+        type: "exam",
+        score: 45,
+      },
+      {
+        type: "homework",
+        score: 39,
+      },
+      {
+        type: "quiz",
+        score: 40,
+      },
+      {
+        type: "homework",
+        score: 88,
+      },
+    ],
+    class_id: 551,
+  },
+])
+```
+
+### 5.2. Finding Documents in a MongoDB Collection
+
+The following code demonstrates how to query documents in MongoDB.
+
+#### 5.2.1. Find a Document with Equality
+
+When given equality with an `_id` field, the `find()` command will return the specified document that matches the `_id`. Here's an example:
+
+```js
+db.zips.find({ _id: ObjectId("5c8eccc1caa187d17ca6ed16") })
+```
+
+#### 5.2.2. Find a Document by Using the $in Operator
+
+Use the `$in` operator to select documents where the value of a field equals any value in the specified array. Here's an example:
+
+```js
+db.zips.find({ city: { $in: ["PHOENIX", "CHICAGO"] } })
+```
+
+
+### 5.3. Finding Documents by Using Comparison Operators
+
+These are the most basic comparison operators: `$gt`, `$lt`, `$lte`, and `$gte`.
+
+#### 5.3.1. Greater than ($gt)
+
+Use the `$gt` operator to match documents with a field **greater than** the given value. For example:
+
+```js
+db.sales.find({ "items.price": { $gt: 50}})
+```
+
+#### 5.3.2. Less than ($lt)
+
+Use the `$lt` operator to match documents with a field **less than** the given value. For example:
+
+```js
+db.sales.find({ "items.price": { $lt: 50}})
+```
+
+#### 5.3.3.  Less than or equal ($lte)
+
+Use the `$lte` operator to match documents with a field **less than or equal** to the given value. For example:
+
+```js
+db.sales.find({ "customer.age": { $lte: 65}})
+```
+
+#### 5.3.4. Greater than or equal ($gte)
+
+Use the `$gte` operator to match documents with a field **greater than or equal** to the given value. For example:
+
+```js
+db.sales.find({ "customer.age": { $gte: 65}})
+```
+
+### 5.4. Querying on Array Elements in MongoDB
+
+The following code demonstrates how to query array elements in MongoDB.
+
+#### 5.4.1. Find Documents with an Array That Contains a Specified Value
+
+In the following example, "InvestmentFund" is not enclosed in square brackets, so MongoDB returns all documents within the `products` array that contain the specified value. The query may return either scalar elements that contain this value, or arrays with any of its elements vaule matches the queried value.
+
+```js
+db.accounts.find({ products: "InvestmentFund"})
+```
+
+#### 5.4.2. Find a Document by Using the $elemMatch Operator
+
+We use the `$elemMatch` operator to find all documents that contain the specified subdocument. For example:
+
+```js
+db.sales.find({
+  items: {
+    $elemMatch: { name: "laptop", price: { $gt: 800 }, quantity: { $gte: 1 } },
+  },
+})
+```
+### 5.5. Finding Documents by Using Logical Operators
+
+Review the following logical operators: implicit `$and`, `$or`, and `$and`.
+
+#### 5.5.1. Find a Document by Using Implicit $and
+
+Use implicit $and to select documents that match multiple expressions. For example:
+
+```js
+db.routes.find({ "airline.name": "Southwest Airlines", stops: { $gte: 1 } })
+```
+
+#### 5.5.2. Find a Document by Using the $or Operator
+
+Use the $or operator to select documents that match at least one of the included expressions. For example:
+
+```js
+db.routes.find({
+  $or: [{ dst_airport: "SEA" }, { src_airport: "SEA" }],
+})
+```
+
+#### 5.5.3. Find a Document by Using the $and Operator
+
+Use the $and operator to use multiple $or expressions in your query.
+
+```js
+db.routes.find({
+  $and: [
+    { $or: [{ dst_airport: "SEA" }, { src_airport: "SEA" }] },
+    { $or: [{ "airline.name": "American Airlines" }, { airplane: 320 }] },
+  ]
+})
+```
+
+### 5.6. Resources
+
+Use the following resources to learn more about inserting and finding documents in MongoDB:
+Lesson 1 - Inserting Documents
+
+    MongoDB Docs: insertOne()
+
+    MongoDB Docs: insertMany()
+
+Lesson 2 - Finding Documents
+
+    MongoDB Docs: find()
+
+    MongoDB Docs: $in
+
+Lesson 3 - Finding Documents Using Comparison Operators
+
+    MongoDB Docs: Comparison Operators
+
+Lesson 4 - Querying on Array Elements
+
+    MongoDB Docs: $elemMatch
+
+    MongoDB Docs: Querying Arrays
+
+Lesson 5 - Finding Documents Using Logical Operators
+
+    MongoDB Docs: Logical Operators
