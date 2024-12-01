@@ -1358,3 +1358,107 @@ Use the following resources to learn more about modifying query results in Mongo
 
 - MongoDB Docs: [deleteOne()](https://www.mongodb.com/docs/v5.3/reference/method/db.collection.deleteOne/)
 - MongoDB Docs: [deleteMany()](https://www.mongodb.com/docs/v5.3/reference/method/db.collection.deleteMany/?_ga=2.23103219.810066485.1665291537-836515500.1666025886)
+
+## 7. MongoDB CRUD Operations: Modifying Query Results
+
+In this unit, we learn how to modify query results in MongoDB by using sorts, limits, projections, and counts. First, you will learn how to organize query results by sorting and limiting the documents that are returned. Then you'll explore how to use projection to return selected fields from a query. Finally, you’ll learn how to count the number of documents that match a query. Using these query modifications will help enhance the functionality and performance of your applications.
+
+### 7.1. Sorting and Limiting Query Results in MongoDB
+
+The following code demonstrates how to sort and limit query results.
+
+#### 7.1.1. Sorting Results
+
+Use `cursor.sort()` to return query results in a specified order. Within the parentheses of `sort()`, include an object that specifies the field(s) to sort by and the order of the sort. Use `1` for **ascending order**, and `-1` for `descending order`.
+
+**Syntax:**
+
+```js
+db.collection.find(<query>).sort(<sort>)
+```
+
+**Example:**
+
+```js
+// Return data on all music companies, sorted alphabetically from A to Z.
+db.companies.find({ category_code: "music" }).sort({ name: 1 });
+```
+
+To ensure documents are returned in a **consistent order**, include a field that contains unique values in the sort. An easy way to do this is to include the `_id` field in the sort. Here's an example:
+
+```js
+// Return data on all music companies, sorted alphabetically from A to Z. Ensure consistent sort order
+db.companies.find({ category_code: "music" }).sort({ name: 1, _id: 1 });
+```
+
+#### 7.1.2. Limiting Results
+
+
+Use `cursor.limit()` to specify the maximum number of documents the cursor will return. Within the parentheses of `limit()`, specify the maximum number of documents to return.
+
+**Syntax:**
+
+```js
+db.companies.find(<query>).limit(<number>)
+```
+
+**Example:**
+
+```js
+// Return the three music companies with the highest number of employees. Ensure consistent sort order.
+db.companies
+  .find({ category_code: "music" })
+  .sort({ number_of_employees: -1, _id: 1 })
+  .limit(3);
+```
+
+#### 7.1.3. Lab Practice
+
+##### Return Query Results in Ascending Order
+
+In this activity, you will return query results in ascending order.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection. (Suggestion: run `db.sales.findOne()` to return a sample document and review the structure of the data in this this collection.)
+
+1. Return the data on all sales, ordered by date from oldest to newest.
+
+```js
+db.sales.find().sort({saleDate:1});
+```
+
+##### Return Query Results in Descending Order
+
+In this activity, you will return query results in descending order.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database. You will use the `sales` collection.
+
+1. Return the data on all sales made online using a coupon, ordered by date from the most recent to the oldest.
+
+```js
+db.sales.find({couponUsed: true}).sort({saleDate:-1})
+```
+
+##### Return a Limited Number of Sorted Results
+
+In this activity, you will return query results sorted by most recent and specify the maximum number of documents to return.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database. You will use the `sales` collection.
+
+1. Return the data on the three most recent sales made from the London store that included one or more of the following items: a laptop, a backpack or printer paper.
+
+```js
+db.sales.find({
+  storeLocation: "London",
+  "items.name": {$in: ["laptop","backpack","printer paper"]}
+}).sort({saleDate: 1}).limit(3);
+```
+
+### 7.2. Returning Specific Data from a Query in MongoDB
