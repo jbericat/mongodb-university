@@ -1463,11 +1463,11 @@ db.sales.find({
 
 ### 7.2. Returning Specific Data from a Query in MongoDB
 
-Review the following code, which demonstrates how to return selected fields from a query.
+The following code demonstrates how to return selected fields from a query.
 
 #### 7.2.1. Add a Projection Document
 
-To specify fields to include or exclude in the result set, add a projection document as the second parameter in the call to db.collection.find().
+To specify fields to include or exclude in the result set, add a projection document as the second parameter in the call to `db.collection.find()`.
 
 Syntax:
 
@@ -1513,7 +1513,7 @@ db.inspections.find(
 )
 ```
 
-While the _id field is included by default, it can be suppressed by setting its value to 0 in any projection.
+While the `_id` field is included by default, it can be suppressed by setting its value to 0 in any projection.
 
 ```js
 // Return all restaurant inspections - business name and result fields only
@@ -1522,3 +1522,135 @@ db.inspections.find(
   { business_name: 1, result: 1, _id: 0 }
 )
 ```
+
+> (!) Notice that we cannot use inclusion and exclusion in the same projection, excepting for the case of the `_id` field
+
+#### 7.2.4. Lab Practice
+
+##### Return Selected Fields, Including the _id Field
+
+In this activity, you will write a query that returns only selected fields from matching documents, including the `_id` field.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity. (Suggestion: run `db.sales.findOne()` to return a sample document and review the structure of the data in this collection.)
+
+1. Query for all sales at the Denver store. Return only the sale date, store location, purchase method and `_id` fields.
+
+```js
+db.sales.findOne()
+
+{
+  _id: ObjectId('5bd761dcae323e45a93ccfe9'),
+  saleDate: ISODate('2015-08-25T10:01:02.918Z'),
+  items: [
+    {
+      name: 'envelopes',
+      tags: [ 'stationary', 'office', 'general' ],
+      price: Decimal128('8.05'),
+      quantity: 10
+    },
+    {
+      name: 'binder',
+      tags: [ 'school', 'general', 'organization' ],
+      price: Decimal128('28.31'),
+      quantity: 9
+    },
+    {
+      name: 'notepad',
+      tags: [ 'office', 'writing', 'school' ],
+      price: Decimal128('20.95'),
+      quantity: 3
+    },
+    {
+      name: 'laptop',
+      tags: [ 'electronics', 'school', 'office' ],
+      price: Decimal128('866.5'),
+      quantity: 4
+    },
+    {
+      name: 'notepad',
+      tags: [ 'office', 'writing', 'school' ],
+      price: Decimal128('33.09'),
+      quantity: 4
+    },
+    {
+      name: 'printer paper',
+      tags: [ 'office', 'stationary' ],
+      price: Decimal128('37.55'),
+      quantity: 1
+    },
+    {
+      name: 'backpack',
+      tags: [ 'school', 'travel', 'kids' ],
+      price: Decimal128('83.28'),
+      quantity: 2
+    },
+    {
+      name: 'pens',
+      tags: [ 'writing', 'office', 'school', 'stationary' ],
+      price: Decimal128('42.9'),
+      quantity: 4
+    },
+    {
+      name: 'envelopes',
+      tags: [ 'stationary', 'office', 'general' ],
+      price: Decimal128('16.68'),
+      quantity: 2
+    }
+  ],
+  storeLocation: 'Seattle',
+  customer: { gender: 'M', age: 50, email: 'keecade@hem.uy', satisfaction: 5 },
+  couponUsed: false,
+  purchaseMethod: 'Phone'
+}
+```
+
+```js
+db.sales.findOne({storeLocation: "Denver"},{saleDate:1, storeLocation:1, purchaseMethod:1})
+
+{
+  _id: ObjectId('5bd761dcae323e45a93ccfea'),
+  saleDate: ISODate('2017-06-22T09:54:14.185Z'),
+  storeLocation: 'Denver',
+  purchaseMethod: 'In store'
+}
+```
+
+##### Return Selected Fields, Excluding the _id Field
+
+In this activity, you will write a query that returns only selected fields from matching documents, excluding the `_id` field.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity.
+
+1. Find the data on sales to customers less than 30 years old in which the customer satisfaction rating was greater than three. Return only the customer's age and satisfaction rating, the sale date and store location. Do not include the `_id` field.
+
+```js
+db.sales.findOne({"customer.age": {$lt: 30}, "customer.satisfaction": {$gt: 3}},{_id:0, "customer.age": 1, "customer.satisfaction": 1})
+
+{ customer: { age: 29, satisfaction: 5 } }
+```
+
+##### Return All Fields Except Those Explicitly Excluded
+
+In this activity, you will write a query that returns all fields except those explicitly excluded using a projection.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity.
+
+1. Find data on **all sales** from the Seattle and New York stores. Return all data except the purchase method, customer information, and whether a coupon was used.
+
+```js
+db.sales.find({storeLocation: {$in: ["Seattle", "New York"]}},{purchaseMethod:0, customer: 0, couponUsed: 0})
+```
+
+### 7.3 Counting Documents in a MongoDB Collection
