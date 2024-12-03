@@ -1653,4 +1653,63 @@ You will use the `sales` collection for this activity.
 db.sales.find({storeLocation: {$in: ["Seattle", "New York"]}},{purchaseMethod:0, customer: 0, couponUsed: 0})
 ```
 
-### 7.3 Counting Documents in a MongoDB Collection
+### 7.3. Counting Documents in a MongoDB Collection
+
+The following code demonstrates how to count the number of documents that match a query.
+
+#### 7.3.1. Count Documents
+
+Use `db.collection.countDocuments()` to count the number of documents that match a query. `countDocuments()` takes two parameters: a query document and an options document.
+
+**Syntax:**
+
+```js
+db.collection.countDocuments( <query>, <options> )
+```
+
+The query selects the documents to be counted.
+
+**Examples:**
+
+```js
+// Count number of docs in trip collection
+db.trips.countDocuments({})
+
+// Count number of trips over 120 minutes by subscribers
+db.trips.countDocuments({ tripduration: { $gt: 120 }, usertype: "Subscriber" })
+```
+
+#### 7.3.2. Lab Practice
+
+##### Count All Documents in a Collection
+
+In this activity, you will count all documents in a collection.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the sample_supplies database.
+
+You will use the sales collection for this activity. (Suggestion: run `db.sales.findOne()` to return a sample document and review the structure of the data in this this collection.)
+
+1. Find the total number of documents in the `sales` collection.
+
+```js
+db.sales.countDocuments()
+```
+
+##### Count All Documents That Match a Query (1)
+
+In this activity, you will count all documents that match a query made with an equality constraint.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity.
+
+1. Find the number of sales made using a coupon at the Denver location.
+
+```js
+db.sales.countDocuments({couponUsed: true})
+
+```
