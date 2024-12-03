@@ -1758,3 +1758,108 @@ Use the following resources to learn more about modifying query results in Mongo
 **Lesson 03: Counting Documents in a MongoDB Collection**
 
 - MongoDB Docs: [db.collection.countDocuments()](https://www.mongodb.com/docs/manual/reference/method/db.collection.countDocuments/?_ga=2.30900342.810066485.1665291537-836515500.1666025886)
+
+
+## 8. MongoDB indexes
+
+In this unit, we will learn about indexes, how indexes support the efficient execution of queries in MongoDB, the trade-offs associated with using indexes, how to create Single Field and Compound Index, what Multikey indexes are, and how to see if queries are using indexes. Finally, we will learn how to delete an index.
+
+### 8.1. Using Indexes in Collections
+
+TO-DO
+
+### 8.2. Creating a Single Field Index
+
+The code below demonstrates how to create a single field index in a collection.
+
+#### 8.2.1. Create a Single Field Index
+
+Use `createIndex()` to create a new index in a collection. Within the parentheses of `createIndex()`, include an object that contains the field and sort order.
+
+```js
+db.customers.createIndex({
+  birthdate: 1
+})
+```
+
+#### 8.2.2. Create a Unique Single Field Index
+
+Add `{unique:true}` as a second, optional, parameter in `createIndex()` to force uniqueness in the index field values. Once the unique index is created, any inserts or updates including duplicated values in the collection for the index field/s will fail.
+
+```js
+db.customers.createIndex({
+  email: 1
+},
+{
+  unique:true
+})
+```
+
+MongoDB only creates the unique index if there is no duplication in the field values for the index field/s.
+
+#### 8.2.3. View the Indexes used in a Collection
+
+Use `getIndexes()` to see all the indexes created in a collection.
+
+```js
+db.customers.getIndexes()
+```
+
+#### 8.2.4. Check if an index is being used on a query
+
+Use `explain()` in a collection when running a query to see the Execution plan. This plan provides the details of the execution stages (IXSCAN , COLLSCAN, FETCH, SORT, etc.).
+
+- The `IXSCAN` stage indicates the query is using an index and what index is being selected.
+- The `COLLSCAN` stage indicates a collection scan is perform, not using any indexes.
+- The `FETCH` stage indicates documents are being read from the collection.
+- The `SORT` stage indicates documents are being sorted in memory.
+
+```js
+db.customers.explain().find({
+  birthdate: {
+    $gt: ISODate("1995-08-01")
+  }
+})
+
+db.customers.explain().find({
+  birthdate: {
+    $gt: ISODate("1995-08-01")
+  }
+  }).sort({
+    email:1
+})
+```
+
+#### 8.2.5. Lab Practice
+
+##### Get Indexes for a MongoDB Collection
+
+In this lab, you will retrieve an array of indexes that hold information about the indexes on the `transfers` collection.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bank` database. Use the `transfers` collection for this lab.
+
+**Lab Instructions**
+
+1. Run the command that returns an array of indexes on the transfers collection.
+
+```js
+db.transfers.getIndexes()
+```
+
+2. After running the command, notice that the indexes are returned in an array:
+
+```json
+[
+  { v: 2, key: { _id: 1 }, name: '_id_' },
+]
+```
+
+### 8.3. Creating a Multikey Index
+
+
+
+### 8.4. Working with Compound Indexes
+
+
+
+### 8.5. Deleting Indexes
