@@ -1842,16 +1842,68 @@ Before you begin, please note that you are now connected to an Atlas cluster and
 
 1. Run the command that returns an array of indexes on the transfers collection.
 
-```js
-db.transfers.getIndexes()
-```
+    ```js
+    db.transfers.getIndexes()
+    ```
 
 2. After running the command, notice that the indexes are returned in an array:
 
-```json
-[
-  { v: 2, key: { _id: 1 }, name: '_id_' },
-]
+    ```json
+    [
+      { v: 2, key: { _id: 1 }, name: '_id_' },
+    ]
+    ```
+
+##### Create an Index with an Equality Constraint
+
+In this lab, we will create a single field index on the `accounts` collection of the `bank` database. We will create this single field index with a unique constraint on a field to ensure that there can only exist one document in the collection with a given value for the indexed field.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bank` database. Use the `accounts` collection for this lab.
+
+**Lab Instructions**
+
+1. Run `db.accounts.findOne()` to view the first document in the collection to understand the structure of the document. You should see a document similar to the following:
+
+    ```json
+    {
+      _id: ObjectId("62d6e04ecab6d8e130497487"),
+      account_id: 'MDB829000996',
+      account_holder: 'Kasper Sørensen',
+      account_type: 'checking',
+      balance: Decimal128("3373.98000000000"),
+      transfers_complete: [
+        'TR266268604',
+        'TR399880553',
+        'TR277358549',
+        'TR695865388',
+        'TR573014677'
+      ]
+    }
+    ```
+
+2. Create a single field index with a unique constraint on the `account_id` field to ensure that only one document has a given value for the indexed field.
+
+```js
+db.accounts.createIndex({account_id:1},{unique:1})
+```
+
+##### Use explain() to Verify that Indexes are Working
+
+In this lab, we will use a command to view the winningPlan for a query that uses an index. A winningPlan is a document that contains information about the query and the method that was used to execute the query.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the bank database. Use the accounts collection for this lab.
+Lab Instructions
+
+1. In this lab, you will use the accounts collection. First, create a query that finds a document with the `account_id` field equal to `MDB829000996`.
+
+```js
+db.accounts.find({account_id: "MDB829000996"})
+```
+
+2. Add the `explain()` method to your query to view the `winningPlan`
+
+```js
+db.accounts.explain().find({account_id: "MDB829000996"})
 ```
 
 ### 8.3. Creating a Multikey Index
