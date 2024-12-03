@@ -1710,6 +1710,51 @@ You will use the `sales` collection for this activity.
 1. Find the number of sales made using a coupon at the Denver location.
 
 ```js
-db.sales.countDocuments({couponUsed: true})
-
+db.sales.countDocuments({storeLocation: "Denver", couponUsed: true})
 ```
+
+##### Count All Documents That Match a Query (2)
+
+In this activity, you will count all documents that match a query made with an array operator and a comparison operator.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity.
+
+1. Find the number of sales that included a laptop that cost less than $600.
+
+```js
+db.sales.countDocuments({items: {$elemMatch: {name: "laptop", price: {$lt: 600}}}})
+```
+
+### 7.4. Conclusion
+
+#### 7.4.1. Summary
+
+In this unit, you learned how to modify query results with MongoDB. Specifically, you learned how to:
+
+- Return query results in a specified order by using `cursor.sort()`.
+- Constrained the number of results returned by using `cursor.limit()`.
+- Specified fields to return by adding a projection document parameter in calls to `db.collection.find()`.
+- Counted the number of documents that match a query by using db.collection.`countDocuments()`.
+
+#### 7.4.2. Resources
+
+Use the following resources to learn more about modifying query results in MongoDB:
+
+**Lesson 01: Sorting and Limiting Query Results in MongoDB**
+
+- MongoDB Docs: [cursor.sort()](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/?_ga=2.22528882.810066485.1665291537-836515500.1666025886)
+- MongoDB Docs: [cursor.limit()](https://www.mongodb.com/docs/manual/reference/method/cursor.limit/?_ga=2.22528882.810066485.1665291537-836515500.1666025886)
+
+**Lesson 02: Returning Specific Data from a Query in MongoDB**
+
+- MongoDB Docs: [Project Fields to Return from Query](https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/?_ga=2.22528882.810066485.1665291537-836515500.1666025886)
+
+- MongoDB Docs: [Projection Restrictions](https://www.mongodb.com/docs/manual/reference/limits/?_ga=2.22528882.810066485.1665291537-836515500.1666025886#mongodb-limit-Projection-Restrictions)
+
+**Lesson 03: Counting Documents in a MongoDB Collection**
+
+- MongoDB Docs: [db.collection.countDocuments()](https://www.mongodb.com/docs/manual/reference/method/db.collection.countDocuments/?_ga=2.30900342.810066485.1665291537-836515500.1666025886)
