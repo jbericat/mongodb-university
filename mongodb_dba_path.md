@@ -84,7 +84,7 @@ Benfits:
 
 ### 2.3. Modeling Data Relationships
 
-### 2.3.1. Embedding
+#### 2.3.1. Embedding
 
 We can implement one to many using nested dictionaries (which in mdb is called "sub-document embedding" or simply "nested documents"), like:
 
@@ -473,7 +473,7 @@ Key facts:
 
 > TO-DO: CHECK THE VIDEO AGAIN & ELLABORATE
 
-### 3.3.1. Code Summary: Using the MongoDB Shell
+#### 3.3.1. Code Summary: Using the MongoDB Shell
 
 The following sections explain how to use `mongosh` to run external scripts and to edit commands in an external editor.
 
@@ -826,7 +826,7 @@ MongoServerError: bad auth : Authentication failed.
 
 > Notice that an authentication error might be triggered if any other part of the connection string was not properly typed, so make sure the connection string is exactly what we copied from the Atlas website.
 
-#### 4.6. Resources
+### 4.6. Resources
 
 Resources
 
@@ -852,3 +852,1066 @@ Use the following resources to learn more about connecting to your database.
 **Lesson 05: Troubleshooting MongoDB Atlas Connection Errors**
 
 - MongoDB Docs: [Troubleshoot Connection Issues](https://www.mongodb.com/docs/atlas/troubleshoot-connection/)
+
+## 5. MongoDB CRUD Operations: Insert and Find Documents
+
+**Unit Overview**
+
+In this unit, you will be introduced to `CRUD` operations in MongoDB by inserting and finding documents. Inserting and finding documents will help you discover the ease and usability of MongoDB. You'll also build your own queries that use comparison and logical operators. Using operators will make your queries more precise and, in turn, make your application easier to develop. Finally, you'll learn how to query elements in an array. Arrays are a crucial data type that you will encounter frequently, so it's important that you have a solid understanding of how to work with them.
+
+### 5.1. Inserting Documents in a MongoDB Collection
+
+The following code demonstrates how to insert a single document and multiple documents into a collection.
+
+#### 5.1.1. Insert a Single Document
+
+Use `insertOne()` to insert a document into a collection. Within the parentheses of `insertOne()`, include an object that contains the document data. Here's an example:
+
+```js
+db.grades.insertOne({
+  student_id: 654321,
+  products: [
+    {
+      type: "exam",
+      score: 90,
+    },
+    {
+      type: "homework",
+      score: 59,
+    },
+    {
+      type: "quiz",
+      score: 75,
+    },
+    {
+      type: "homework",
+      score: 88,
+    },
+  ],
+  class_id: 550,
+})
+```
+
+#### 5.1.2. Insert Multiple Documents
+
+Use `insertMany()` to insert multiple documents at once. Within `insertMany()`, include the documents within an array. Each document should be separated by a comma. Here's an example:
+
+```js
+db.grades.insertMany([
+  {
+    student_id: 546789,
+    products: [
+      {
+        type: "quiz",
+        score: 50,
+      },
+      {
+        type: "homework",
+        score: 70,
+      },
+      {
+        type: "quiz",
+        score: 66,
+      },
+      {
+        type: "exam",
+        score: 70,
+      },
+    ],
+    class_id: 551,
+  },
+  {
+    student_id: 777777,
+    products: [
+      {
+        type: "exam",
+        score: 83,
+      },
+      {
+        type: "quiz",
+        score: 59,
+      },
+      {
+        type: "quiz",
+        score: 72,
+      },
+      {
+        type: "quiz",
+        score: 67,
+      },
+    ],
+    class_id: 550,
+  },
+  {
+    student_id: 223344,
+    products: [
+      {
+        type: "exam",
+        score: 45,
+      },
+      {
+        type: "homework",
+        score: 39,
+      },
+      {
+        type: "quiz",
+        score: 40,
+      },
+      {
+        type: "homework",
+        score: 88,
+      },
+    ],
+    class_id: 551,
+  },
+])
+```
+
+### 5.2. Finding Documents in a MongoDB Collection
+
+The following code demonstrates how to query documents in MongoDB.
+
+#### 5.2.1. Find a Document with Equality
+
+When given equality with an `_id` field, the `find()` command will return the specified document that matches the `_id`. Here's an example:
+
+```js
+db.zips.find({ _id: ObjectId("5c8eccc1caa187d17ca6ed16") })
+```
+
+#### 5.2.2. Find a Document by Using the $in Operator
+
+Use the `$in` operator to select documents where the value of a field equals any value in the specified array. Here's an example:
+
+```js
+db.zips.find({ city: { $in: ["PHOENIX", "CHICAGO"] } })
+```
+
+
+### 5.3. Finding Documents by Using Comparison Operators
+
+These are the most basic comparison operators: `$gt`, `$lt`, `$lte`, and `$gte`.
+
+#### 5.3.1. Greater than ($gt)
+
+Use the `$gt` operator to match documents with a field **greater than** the given value. For example:
+
+```js
+db.sales.find({ "items.price": { $gt: 50}})
+```
+
+#### 5.3.2. Less than ($lt)
+
+Use the `$lt` operator to match documents with a field **less than** the given value. For example:
+
+```js
+db.sales.find({ "items.price": { $lt: 50}})
+```
+
+#### 5.3.3.  Less than or equal ($lte)
+
+Use the `$lte` operator to match documents with a field **less than or equal** to the given value. For example:
+
+```js
+db.sales.find({ "customer.age": { $lte: 65}})
+```
+
+#### 5.3.4. Greater than or equal ($gte)
+
+Use the `$gte` operator to match documents with a field **greater than or equal** to the given value. For example:
+
+```js
+db.sales.find({ "customer.age": { $gte: 65}})
+```
+
+### 5.4. Querying on Array Elements in MongoDB
+
+The following code demonstrates how to query array elements in MongoDB.
+
+#### 5.4.1. Find Documents with an Array That Contains a Specified Value
+
+In the following example, "InvestmentFund" is not enclosed in square brackets, so MongoDB returns all documents within the `products` array that contain the specified value. The query may return either scalar elements that contain this value, or arrays with any of its elements vaule matches the queried value.
+
+```js
+db.accounts.find({ products: "InvestmentFund"})
+```
+
+#### 5.4.2. Find a Document by Using the $elemMatch Operator
+
+We use the `$elemMatch` operator to find all documents that contain the specified subdocument. For example:
+
+```js
+db.sales.find({
+  items: {
+    $elemMatch: { name: "laptop", price: { $gt: 800 }, quantity: { $gte: 1 } },
+  },
+})
+```
+### 5.5. Finding Documents by Using Logical Operators
+
+Review the following logical operators: implicit `$and`, `$or`, and `$and`.
+
+#### 5.5.1. Find a Document by Using Implicit $**and**
+
+Use implicit $and to select documents that match multiple expressions. For example:
+
+```js
+db.routes.find({ "airline.name": "Southwest Airlines", stops: { $gte: 1 } })
+```
+
+#### 5.5.2. Find a Document by Using the $or Operator
+
+Use the $or operator to select documents that match at least one of the included expressions. For example:
+
+```js
+db.routes.find({****
+  $or: [{ dst_airport: "SEA" }, { src_airport: "SEA" }],
+})
+```
+
+#### 5.5.3. Find a Document by Using the $and Operator
+
+Use the $and operator to use multiple $or expressions in your query.
+
+```js
+db.routes.find({
+  $and: [
+    { $or: [{ dst_airport: "SEA" }, { src_airport: "SEA" }] },
+    { $or: [{ "airline.name": "American Airlines" }, { airplane: 320 }] },
+  ]
+})
+```
+
+### 5.6. Resources
+
+Use the following resources to learn more about inserting and finding documents in MongoDB:
+
+**Lesson 1 - Inserting Documents**
+
+- MongoDB Docs: [insertOne()](https://docs.mongodb.com/manual/reference/method/db.collection.insertOne/)
+- MongoDB Docs: [insertMany()](https://docs.mongodb.com/manual/reference/method/db.collection.insertMany/)
+
+**Lesson 2 - Finding Documents**
+
+- MongoDB Docs: [find()](https://docs.mongodb.com/manual/reference/method/db.collection.find/)
+- MongoDB Docs: [$in](https://docs.mongodb.com/manual/reference/operator/query/in/)
+
+**Lesson 3 - Finding Documents Using Comparison Operators**
+
+- MongoDB Docs: [Comparison Operators](https://docs.mongodb.com/manual/reference/operator/query-comparison/)
+
+**Lesson 4 - Querying on Array Elements**
+
+- MongoDB Docs: [$elemMatch](https://docs.mongodb.com/manual/reference/operator/query/elemMatch/)
+- MongoDB Docs: [Querying Arrays](https://docs.mongodb.com/manual/tutorial/query-array-of-documents/#combination-of-elements-satisfies-the-criteria)
+
+**Lesson 5 - Finding Documents Using Logical Operators**
+
+- MongoDB Docs: [Logical Operators](https://docs.mongodb.com/manual/reference/operator/query-logical/)
+
+## 6. MongoDB CRUD Operations: Replace and Delete Documents
+
+In this unit, we'll learn how to update, replace, and delete documents in MongoDB. These commands will help you manipulate data in your database and will prepare you to build MongoDB into your own apps. We will replace entire documents, update individual fields in a document, insert new documents, and remove documents from a database. By the end of this unit, you'll be able to execute most of the common database operations.
+
+### 6.1. Replacing a Document in MongoDB
+
+To replace documents in MongoDB, we use the `replaceOne()` method. The `replaceOne()` method takes the following parameters:
+
+- `filter`: A query that matches the document to replace.
+- `replacement`: The new document to replace the old one with.
+- `options`: An object that specifies options for the update.
+
+In the next example, we use the `_id` field to filter the document. In our replacement document, we provide the entire document that should be inserted in its place:
+
+```js
+db.books.replaceOne(
+  {
+    _id: ObjectId("6282afeb441a74a98dbbec4e"),
+  },
+  {
+    title: "Data Science Fundamentals for Python and MongoDB",
+    isbn: "1484235967",
+    publishedDate: new Date("2018-5-10"),
+    thumbnailUrl:
+      "https://m.media-amazon.com/images/I/71opmUBc2wL._AC_UY218_.jpg",
+    authors: ["David Paper"],
+    categories: ["Data Science"],
+  }
+)
+```
+
+### 6.2. Updating MongoDB Documents by Using updateOne()
+
+The `updateOne()` method accepts a filter document, an update document, and an optional options object. MongoDB provides update operators and options to help you update documents. In this section, we'll cover three of them: `$set`, `upsert`, and `$push`.
+
+
+#### 6.2.1. Replaces the value of a field with the specified value ($set)
+
+The `$set` operator replaces the value of a field with the specified value, as shown in the following code:
+
+```js
+db.podcasts.updateOne(
+  {
+    _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8"),
+  },
+  {
+    $set: {
+      subscribers: 98562,
+    },
+  }
+)
+```
+
+#### 6.2.2. Create a new document if no documents match the filtered criteria (upsert)
+
+The `upsert` option creates a new document if no documents match the filtered criteria. Here's an example:
+
+```js
+db.podcasts.updateOne(
+  { title: "The Developer Hub" },
+  { $set: { topics: ["databases", "MongoDB"] } },
+  { upsert: true }
+)
+```
+
+#### 6.2.3. Add a new value to the hosts array field ($push)
+
+The `$push` operator adds a new value to the hosts array field. Here's an example:
+
+```js
+db.podcasts.updateOne(
+  { _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8") },
+  { $push: { hosts: "Nic Raboy" } }
+)
+```
+
+### 6.3. Updating MongoDB Documents by Using findAndModify()
+
+The `findAndModify()` method is used to find and replace a single document in MongoDB. It accepts a filter document, a replacement document, and an optional options object. The following code shows an example:
+
+```js
+db.podcasts.findAndModify({
+  query: { _id: ObjectId("6261a92dfee1ff300dc80bf1") },
+  update: { $inc: { subscribers: 1 } },
+  new: true,
+})
+```
+
+### 6.4. Updating MongoDB Documents by Using updateMany()
+
+To update multiple documents, use the `updateMany()` method. This method accepts a **filter document**, an **update document**, and an optional **options object**. The following code shows an example:
+
+```js
+db.books.updateMany(
+  { publishedDate: { $lt: new Date("2019-01-01") } },
+  { $set: { status: "LEGACY" } }
+)
+```
+
+> **When to use `updateMany()`:**
+>
+> - Is not an all-or-nothing operation (**is not atomic**), which means that if an operation fails, the method will not rollback the updates, so only some documents might be updated. If that happens, we might have to run the method again.
+> - `updateMany()` **lacks isolation**, which means that updates will be visible as soon as they are performed. Because of this, this method is not appropiate for some use cases that may be essential for business requirements, such as financial transactions.
+
+#### 6.4.1. Lab practice
+
+##### Updating Multiple Documents
+
+Imagine you’re working with a research who asked you to update the last_seen field value of the `birds` collection for a few different species at once.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bird_data` database. Use the `birds` collection for this lab.
+
+**Lab Instructions**
+
+1. Update the last_seen date to 2022-01-01 for Blue Jay and Grackle in the birds collection.
+
+```js
+bird_data> db.birds.updateMany(
+	{ common_name: { $in: ["Blue Jay", "Grackle"] }},
+  { $set: { last_seen: new ISODate("2022-01-01") }})
+
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 2,
+  modifiedCount: 2,
+  upsertedCount: 0
+}
+
+db.birds.find({common_name: {$in: ["Blue Jay","Grackle"]}})
+[
+  {
+    _id: ObjectId('6286a5612f3fa87b7d86dcd2'),
+    common_name: 'Grackle',
+    scientific_name: 'Quiscalus quiscula',
+    wingspan_cm: 28.04,
+    habitat: 'pine trees',
+    diet: [ 'insects', 'minnows', 'eggs' ],
+    sightings_count: 7,
+    last_seen: ISODate('2022-05-19T20:20:44.083Z')
+  },
+  {
+    _id: ObjectId('628682d92f3fa87b7d86dcce'),
+    common_name: 'Blue Jay',
+    scientific_name: 'Cyanocitta cristata',
+    wingspan_cm: 34.17,
+    habitat: 'forests',
+    diet: [ 'vegetables', 'nuts', 'grains' ],
+    sightings_count: 4,
+    last_seen: ISODate('2022-05-19T20:20:44.083Z')
+  }
+]
+```
+
+### 6.5. Deleting Documents in MongoDB
+
+To delete documents, we use the `deleteOne()` or `deleteMany()` methods. Both methods accept a filter document and an options object.
+
+#### 6.5.1. Delete One Document
+
+The following code shows an example of the `deleteOne()` method:
+
+```js
+db.podcasts.deleteOne({ _id: Objectid("6282c9862acb966e76bbf20a") })
+```
+
+#### 6.5.2. Delete Many Documents
+
+The following code shows an example of the `deleteMany()` method:
+
+```js
+db.podcasts.deleteMany({category: "crime"})
+```
+
+#### 6.5.3. Lab practice
+
+##### Delete a Single Document
+
+In this activity we will delete one document from the `birds` collection.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bird_data` database. Use the `birds` collection for this lab.
+
+**Lab Instructions**
+
+1. Delete one document from the birds collection that matches the id `ObjectId("62cddf53c1d62bc45439bebf")`
+
+```js
+db.birds.deleteOne({_id: ObjectId("62cddf53c1d62bc45439bebf")})
+
+{ acknowledged: true, deletedCount: 1 }
+```
+
+##### Delete Multiple Documents
+
+In this activity we will delete multiple documents from the `birds` collection.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bird_data` database. Use the `birds` collection for this lab.
+
+**Lab Instructions**
+
+1. Delete all documents in the `birds` collection that have a `sightings_count` of less than or equal to `10`.
+
+```js
+db.birds.deleteMany({sightings_count: {$lte: 10} })
+
+{ acknowledged: true, deletedCount: 3 }
+```
+
+### 6.6. Conclusion
+
+#### 6.6.1. Summary
+
+In this unit, you learned how to modify query results with MongoDB. Specifically, you:
+
+- Replaced a single document by using `db.collection.replaceOne()`.
+- Updated a field value by using the `$set` update operator in db.`collection.updateOne()`.
+- Added a value to an array by using the $push update operator in db.`collection.updateOne()`.
+- Added a new field value to a document by using the upsert option in `db.collection.updateOne()`.
+- Found and modified a document by using `db.collection.findAndModify()`.
+- Updated multiple documents by using `db.collection.updateMany()`.
+- Deleted a document by using `db.collection.deleteOne()`.
+
+#### 6.6.2. Resources
+
+Use the following resources to learn more about modifying query results in MongoDB:
+
+**Lesson 01: Replacing a Document in MongoDB**
+
+- MongoDB Docs: [replaceOne()](https://www.mongodb.com/docs/manual/reference/method/db.collection.replaceOne/?_ga=2.56665699.810066485.1665291537-836515500.1666025886)
+
+**Lesson 02: Updating MongoDB Documents by Using `updateOne()`**
+
+- MongoDB Docs: [Update Operators](https://www.mongodb.com/docs/manual/reference/operator/update/?_ga=2.56665699.810066485.1665291537-836515500.1666025886)
+- MongoDB Docs: [$set](https://docs.mongodb.com/manual/reference/operator/update/set/?_ga=2.56665699.810066485.1665291537-836515500.1666025886)
+- MongoDB Docs: [$push](https://docs.mongodb.com/manual/reference/operator/update/push/?_ga=2.34644840.810066485.1665291537-836515500.1666025886)
+- MongoDB Docs: [upsert](https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/write-operations/upsert/?_ga=2.123127490.810066485.1665291537-836515500.1666025886)
+
+**Lesson 03: Updating MongoDB Documents by Using `findAndModify()`**
+
+- MongoDB Docs: [findAndModify()](https://www.mongodb.com/docs/manual/reference/method/db.collection.findAndModify/?_ga=2.123127490.810066485.1665291537-836515500.1666025886)
+
+**Lesson 04: Updating MongoDB Documents by Using `updateMany()`**
+
+- MongoDB Docs: [updateMany()](https://www.mongodb.com/docs/manual/reference/method/db.collection.updateMany/?_ga=2.123127490.810066485.1665291537-836515500.1666025886)
+
+**Lesson 05: Deleting Documents in MongoDB**
+
+- MongoDB Docs: [deleteOne()](https://www.mongodb.com/docs/v5.3/reference/method/db.collection.deleteOne/)
+- MongoDB Docs: [deleteMany()](https://www.mongodb.com/docs/v5.3/reference/method/db.collection.deleteMany/?_ga=2.23103219.810066485.1665291537-836515500.1666025886)
+
+## 7. MongoDB CRUD Operations: Modifying Query Results
+
+In this unit, we learn how to modify query results in MongoDB by using sorts, limits, projections, and counts. First, you will learn how to organize query results by sorting and limiting the documents that are returned. Then you'll explore how to use projection to return selected fields from a query. Finally, you’ll learn how to count the number of documents that match a query. Using these query modifications will help enhance the functionality and performance of your applications.
+
+### 7.1. Sorting and Limiting Query Results in MongoDB
+
+The following code demonstrates how to sort and limit query results.
+
+#### 7.1.1. Sorting Results
+
+Use `cursor.sort()` to return query results in a specified order. Within the parentheses of `sort()`, include an object that specifies the field(s) to sort by and the order of the sort. Use `1` for **ascending order**, and `-1` for `descending order`.
+
+**Syntax:**
+
+```js
+db.collection.find(<query>).sort(<sort>)
+```
+
+**Example:**
+
+```js
+// Return data on all music companies, sorted alphabetically from A to Z.
+db.companies.find({ category_code: "music" }).sort({ name: 1 });
+```
+
+To ensure documents are returned in a **consistent order**, include a field that contains unique values in the sort. An easy way to do this is to include the `_id` field in the sort. Here's an example:
+
+```js
+// Return data on all music companies, sorted alphabetically from A to Z. Ensure consistent sort order
+db.companies.find({ category_code: "music" }).sort({ name: 1, _id: 1 });
+```
+
+#### 7.1.2. Limiting Results
+
+
+Use `cursor.limit()` to specify the maximum number of documents the cursor will return. Within the parentheses of `limit()`, specify the maximum number of documents to return.
+
+**Syntax:**
+
+```js
+db.companies.find(<query>).limit(<number>)
+```
+
+**Example:**
+
+```js
+// Return the three music companies with the highest number of employees. Ensure consistent sort order.
+db.companies
+  .find({ category_code: "music" })
+  .sort({ number_of_employees: -1, _id: 1 })
+  .limit(3);
+```
+
+#### 7.1.3. Lab Practice
+
+##### Return Query Results in Ascending Order
+
+In this activity, you will return query results in ascending order.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection. (Suggestion: run `db.sales.findOne()` to return a sample document and review the structure of the data in this this collection.)
+
+1. Return the data on all sales, ordered by date from oldest to newest.
+
+```js
+db.sales.find().sort({saleDate:1});
+```
+
+##### Return Query Results in Descending Order
+
+In this activity, you will return query results in descending order.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database. You will use the `sales` collection.
+
+1. Return the data on all sales made online using a coupon, ordered by date from the most recent to the oldest.
+
+```js
+db.sales.find({couponUsed: true}).sort({saleDate:-1})
+```
+
+##### Return a Limited Number of Sorted Results
+
+In this activity, you will return query results sorted by most recent and specify the maximum number of documents to return.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database. You will use the `sales` collection.
+
+1. Return the data on the three most recent sales made from the London store that included one or more of the following items: a laptop, a backpack or printer paper.
+
+```js
+db.sales.find({
+  storeLocation: "London",
+  "items.name": {$in: ["laptop","backpack","printer paper"]}
+}).sort({saleDate: 1}).limit(3);
+```
+
+### 7.2. Returning Specific Data from a Query in MongoDB
+
+The following code demonstrates how to return selected fields from a query.
+
+#### 7.2.1. Add a Projection Document
+
+To specify fields to include or exclude in the result set, add a projection document as the second parameter in the call to `db.collection.find()`.
+
+Syntax:
+
+db.collection.find( <query>, <projection> )
+
+#### 7.2.2. Include a Field
+
+To include a field, set its value to 1 in the projection document.
+
+Syntax:
+
+```js
+db.collection.find( <query>, { <field> : 1 })
+```
+
+Example:
+
+```js
+// Return all restaurant inspections - business name, result, and _id fields only
+db.inspections.find(
+  { sector: "Restaurant - 818" },
+  { business_name: 1, result: 1 }
+)
+```
+
+#### 7.2.3. Exclude a Field
+
+To exclude a field, set its value to 0 in the projection document.
+
+Syntax:
+
+```js
+db.collection.find(query, { <field> : 0, <field>: 0 })
+```
+
+Example:
+
+```js
+// Return all inspections with result of "Pass" or "Warning" - exclude date and zip code
+db.inspections.find(
+  { result: { $in: ["Pass", "Warning"] } },
+  { date: 0, "address.zip": 0 }
+)
+```
+
+While the `_id` field is included by default, it can be suppressed by setting its value to 0 in any projection.
+
+```js
+// Return all restaurant inspections - business name and result fields only
+db.inspections.find(
+  { sector: "Restaurant - 818" },
+  { business_name: 1, result: 1, _id: 0 }
+)
+```
+
+> (!) Notice that we cannot use inclusion and exclusion in the same projection, excepting for the case of the `_id` field
+
+#### 7.2.4. Lab Practice
+
+##### Return Selected Fields, Including the _id Field
+
+In this activity, you will write a query that returns only selected fields from matching documents, including the `_id` field.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity. (Suggestion: run `db.sales.findOne()` to return a sample document and review the structure of the data in this collection.)
+
+1. Query for all sales at the Denver store. Return only the sale date, store location, purchase method and `_id` fields.
+
+```js
+db.sales.findOne()
+
+{
+  _id: ObjectId('5bd761dcae323e45a93ccfe9'),
+  saleDate: ISODate('2015-08-25T10:01:02.918Z'),
+  items: [
+    {
+      name: 'envelopes',
+      tags: [ 'stationary', 'office', 'general' ],
+      price: Decimal128('8.05'),
+      quantity: 10
+    },
+    {
+      name: 'binder',
+      tags: [ 'school', 'general', 'organization' ],
+      price: Decimal128('28.31'),
+      quantity: 9
+    },
+    {
+      name: 'notepad',
+      tags: [ 'office', 'writing', 'school' ],
+      price: Decimal128('20.95'),
+      quantity: 3
+    },
+    {
+      name: 'laptop',
+      tags: [ 'electronics', 'school', 'office' ],
+      price: Decimal128('866.5'),
+      quantity: 4
+    },
+    {
+      name: 'notepad',
+      tags: [ 'office', 'writing', 'school' ],
+      price: Decimal128('33.09'),
+      quantity: 4
+    },
+    {
+      name: 'printer paper',
+      tags: [ 'office', 'stationary' ],
+      price: Decimal128('37.55'),
+      quantity: 1
+    },
+    {
+      name: 'backpack',
+      tags: [ 'school', 'travel', 'kids' ],
+      price: Decimal128('83.28'),
+      quantity: 2
+    },
+    {
+      name: 'pens',
+      tags: [ 'writing', 'office', 'school', 'stationary' ],
+      price: Decimal128('42.9'),
+      quantity: 4
+    },
+    {
+      name: 'envelopes',
+      tags: [ 'stationary', 'office', 'general' ],
+      price: Decimal128('16.68'),
+      quantity: 2
+    }
+  ],
+  storeLocation: 'Seattle',
+  customer: { gender: 'M', age: 50, email: 'keecade@hem.uy', satisfaction: 5 },
+  couponUsed: false,
+  purchaseMethod: 'Phone'
+}
+```
+
+```js
+db.sales.findOne({storeLocation: "Denver"},{saleDate:1, storeLocation:1, purchaseMethod:1})
+
+{
+  _id: ObjectId('5bd761dcae323e45a93ccfea'),
+  saleDate: ISODate('2017-06-22T09:54:14.185Z'),
+  storeLocation: 'Denver',
+  purchaseMethod: 'In store'
+}
+```
+
+##### Return Selected Fields, Excluding the _id Field
+
+In this activity, you will write a query that returns only selected fields from matching documents, excluding the `_id` field.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity.
+
+1. Find the data on sales to customers less than 30 years old in which the customer satisfaction rating was greater than three. Return only the customer's age and satisfaction rating, the sale date and store location. Do not include the `_id` field.
+
+```js
+db.sales.findOne({"customer.age": {$lt: 30}, "customer.satisfaction": {$gt: 3}},{_id:0, "customer.age": 1, "customer.satisfaction": 1})
+
+{ customer: { age: 29, satisfaction: 5 } }
+```
+
+##### Return All Fields Except Those Explicitly Excluded
+
+In this activity, you will write a query that returns all fields except those explicitly excluded using a projection.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity.
+
+1. Find data on **all sales** from the Seattle and New York stores. Return all data except the purchase method, customer information, and whether a coupon was used.
+
+```js
+db.sales.find({storeLocation: {$in: ["Seattle", "New York"]}},{purchaseMethod:0, customer: 0, couponUsed: 0})
+```
+
+### 7.3. Counting Documents in a MongoDB Collection
+
+The following code demonstrates how to count the number of documents that match a query.
+
+#### 7.3.1. Count Documents
+
+Use `db.collection.countDocuments()` to count the number of documents that match a query. `countDocuments()` takes two parameters: a query document and an options document.
+
+**Syntax:**
+
+```js
+db.collection.countDocuments( <query>, <options> )
+```
+
+The query selects the documents to be counted.
+
+**Examples:**
+
+```js
+// Count number of docs in trip collection
+db.trips.countDocuments({})
+
+// Count number of trips over 120 minutes by subscribers
+db.trips.countDocuments({ tripduration: { $gt: 120 }, usertype: "Subscriber" })
+```
+
+#### 7.3.2. Lab Practice
+
+##### Count All Documents in a Collection
+
+In this activity, you will count all documents in a collection.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the sample_supplies database.
+
+You will use the sales collection for this activity. (Suggestion: run `db.sales.findOne()` to return a sample document and review the structure of the data in this this collection.)
+
+1. Find the total number of documents in the `sales` collection.
+
+```js
+db.sales.countDocuments()
+```
+
+##### Count All Documents That Match a Query (1)
+
+In this activity, you will count all documents that match a query made with an equality constraint.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity.
+
+1. Find the number of sales made using a coupon at the Denver location.
+
+```js
+db.sales.countDocuments({storeLocation: "Denver", couponUsed: true})
+```
+
+##### Count All Documents That Match a Query (2)
+
+In this activity, you will count all documents that match a query made with an array operator and a comparison operator.
+
+**Lab Instructions**
+
+You are now connected to an Atlas cluster and the `sample_supplies` database.
+
+You will use the `sales` collection for this activity.
+
+1. Find the number of sales that included a laptop that cost less than $600.
+
+```js
+db.sales.countDocuments({items: {$elemMatch: {name: "laptop", price: {$lt: 600}}}})
+```
+
+### 7.4. Conclusion
+
+#### 7.4.1. Summary
+
+In this unit, you learned how to modify query results with MongoDB. Specifically, you learned how to:
+
+- Return query results in a specified order by using `cursor.sort()`.
+- Constrained the number of results returned by using `cursor.limit()`.
+- Specified fields to return by adding a projection document parameter in calls to `db.collection.find()`.
+- Counted the number of documents that match a query by using db.collection.`countDocuments()`.
+
+#### 7.4.2. Resources
+
+Use the following resources to learn more about modifying query results in MongoDB:
+
+**Lesson 01: Sorting and Limiting Query Results in MongoDB**
+
+- MongoDB Docs: [cursor.sort()](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/?_ga=2.22528882.810066485.1665291537-836515500.1666025886)
+- MongoDB Docs: [cursor.limit()](https://www.mongodb.com/docs/manual/reference/method/cursor.limit/?_ga=2.22528882.810066485.1665291537-836515500.1666025886)
+
+**Lesson 02: Returning Specific Data from a Query in MongoDB**
+
+- MongoDB Docs: [Project Fields to Return from Query](https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/?_ga=2.22528882.810066485.1665291537-836515500.1666025886)
+
+- MongoDB Docs: [Projection Restrictions](https://www.mongodb.com/docs/manual/reference/limits/?_ga=2.22528882.810066485.1665291537-836515500.1666025886#mongodb-limit-Projection-Restrictions)
+
+**Lesson 03: Counting Documents in a MongoDB Collection**
+
+- MongoDB Docs: [db.collection.countDocuments()](https://www.mongodb.com/docs/manual/reference/method/db.collection.countDocuments/?_ga=2.30900342.810066485.1665291537-836515500.1666025886)
+
+
+## 8. MongoDB indexes
+
+In this unit, we will learn about indexes, how indexes support the efficient execution of queries in MongoDB, the trade-offs associated with using indexes, how to create Single Field and Compound Index, what Multikey indexes are, and how to see if queries are using indexes. Finally, we will learn how to delete an index.
+
+### 8.1. Using Indexes in Collections
+
+TO-DO
+
+### 8.2. Creating a Single Field Index
+
+The code below demonstrates how to create a single field index in a collection.
+
+#### 8.2.1. Create a Single Field Index
+
+Use `createIndex()` to create a new index in a collection. Within the parentheses of `createIndex()`, include an object that contains the field and sort order.
+
+```js
+db.customers.createIndex({
+  birthdate: 1
+})
+```
+
+#### 8.2.2. Create a Unique Single Field Index
+
+Add `{unique:true}` as a second, optional, parameter in `createIndex()` to force uniqueness in the index field values. Once the unique index is created, any inserts or updates including duplicated values in the collection for the index field/s will fail.
+
+```js
+db.customers.createIndex({
+  email: 1
+},
+{
+  unique:true
+})
+```
+
+MongoDB only creates the unique index if there is no duplication in the field values for the index field/s.
+
+#### 8.2.3. View the Indexes used in a Collection
+
+Use `getIndexes()` to see all the indexes created in a collection.
+
+```js
+db.customers.getIndexes()
+```
+
+#### 8.2.4. Check if an index is being used on a query
+
+Use `explain()` in a collection when running a query to see the Execution plan. This plan provides the details of the execution stages (IXSCAN , COLLSCAN, FETCH, SORT, etc.).
+
+- The `IXSCAN` stage indicates the query is using an index and what index is being selected.
+- The `COLLSCAN` stage indicates a collection scan is perform, not using any indexes.
+- The `FETCH` stage indicates documents are being read from the collection.
+- The `SORT` stage indicates documents are being sorted in memory.
+
+```js
+db.customers.explain().find({
+  birthdate: {
+    $gt: ISODate("1995-08-01")
+  }
+})
+
+db.customers.explain().find({
+  birthdate: {
+    $gt: ISODate("1995-08-01")
+  }
+  }).sort({
+    email:1
+})
+```
+
+#### 8.2.5. Lab Practice
+
+##### Get Indexes for a MongoDB Collection
+
+In this lab, you will retrieve an array of indexes that hold information about the indexes on the `transfers` collection.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bank` database. Use the `transfers` collection for this lab.
+
+**Lab Instructions**
+
+1. Run the command that returns an array of indexes on the transfers collection.
+
+    ```js
+    db.transfers.getIndexes()
+    ```
+
+2. After running the command, notice that the indexes are returned in an array:
+
+    ```json
+    [
+      { v: 2, key: { _id: 1 }, name: '_id_' },
+    ]
+    ```
+
+##### Create an Index with an Equality Constraint
+
+In this lab, we will create a single field index on the `accounts` collection of the `bank` database. We will create this single field index with a unique constraint on a field to ensure that there can only exist one document in the collection with a given value for the indexed field.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the `bank` database. Use the `accounts` collection for this lab.
+
+**Lab Instructions**
+
+1. Run `db.accounts.findOne()` to view the first document in the collection to understand the structure of the document. You should see a document similar to the following:
+
+    ```json
+    {
+      _id: ObjectId("62d6e04ecab6d8e130497487"),
+      account_id: 'MDB829000996',
+      account_holder: 'Kasper Sørensen',
+      account_type: 'checking',
+      balance: Decimal128("3373.98000000000"),
+      transfers_complete: [
+        'TR266268604',
+        'TR399880553',
+        'TR277358549',
+        'TR695865388',
+        'TR573014677'
+      ]
+    }
+    ```
+
+2. Create a single field index with a unique constraint on the `account_id` field to ensure that only one document has a given value for the indexed field.
+
+```js
+db.accounts.createIndex({account_id:1},{unique:1})
+```
+
+##### Use explain() to Verify that Indexes are Working
+
+In this lab, we will use a command to view the winningPlan for a query that uses an index. A winningPlan is a document that contains information about the query and the method that was used to execute the query.
+
+Before you begin, please note that you are now connected to an Atlas cluster and the bank database. Use the accounts collection for this lab.
+Lab Instructions
+
+1. In this lab, you will use the accounts collection. First, create a query that finds a document with the `account_id` field equal to `MDB829000996`.
+
+```js
+db.accounts.find({account_id: "MDB829000996"})
+```
+
+2. Add the `explain()` method to your query to view the `winningPlan`
+
+```js
+db.accounts.explain().find({account_id: "MDB829000996"})
+```
+
+### 8.3. Creating a Multikey Index
+
+
+
+### 8.4. Working with Compound Indexes
+
+
+
+### 8.5. Deleting Indexes
